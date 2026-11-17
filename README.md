@@ -67,7 +67,7 @@ npx wrangler login          # once
 npx wrangler deploy         # or from the root: pnpm deploy:api
 ```
 
-Set `ALLOWED_ORIGINS` in `apps/api/wrangler.toml` to your Pages domain(s), comma separated
+Set `ALLOWED_ORIGINS` in `apps/api/wrangler.toml` to your Pages domain(s), comma separated; `https://*.oina.pages.dev` covers preview deploys
 (localhost is always allowed). Check it with `https://oina-api.<you>.workers.dev/api/v1/health`.
 
 ### Web (Pages)
@@ -80,7 +80,7 @@ In the Cloudflare dashboard: Workers & Pages → Create → Pages → connect th
 | Build command | `pnpm install --frozen-lockfile && pnpm --filter @oina/web build` |
 | Build output directory | `apps/web/dist` |
 | Root directory | (leave empty) |
-| Environment variable | `VITE_API_BASE` = `https://oina-api.<you>.workers.dev/api/v1` |
+| Environment variable | `VITE_API_BASE` = `https://oina-api.geekio.org` (the `/api/v1` suffix is optional) |
 | Environment variable | `NODE_VERSION` = `22` |
 
 Or build locally and upload: `pnpm build:web && npx wrangler pages deploy apps/web/dist --project-name oina`.

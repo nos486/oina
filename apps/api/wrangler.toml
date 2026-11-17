@@ -5,9 +5,9 @@ compatibility_date = "2026-11-01"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-# Comma-separated origins allowed by CORS. Add your Pages domain(s) here.
+# Comma-separated origins allowed by CORS. "*." matches subdomains (Pages preview deploys).
 # localhost is always allowed for development.
-ALLOWED_ORIGINS = "https://oina.pages.dev"
+ALLOWED_ORIGINS = "https://oina.geekio.org,https://oina.pages.dev,https://*.oina.pages.dev"
 
 # Audio from R2 (optional). Create the bucket first:
 #   npx wrangler r2 bucket create oina-audio

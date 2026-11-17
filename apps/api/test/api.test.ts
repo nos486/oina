@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { app } from '../src/app.js';
+import { app, originAllowed } from '../src/app.js';
 
 const env = { ALLOWED_ORIGINS: 'https://oina.app' };
 const get = (path: string, headers: Record<string, string> = {}) => app.request(path, { headers }, env);
@@ -45,5 +45,21 @@ describe('api', () => {
     expect((await get('/nope')).status).toBe(404);
     expect((await get('/api/v1/progress')).status).toBe(501);
     expect((await get('/audio/tg/words/non.mp3')).status).toBe(404);
+  });
+});
+
+describe('origin allowlist', () => {
+  const rules = ['https://oina.geekio.org', 'https://oina.pages.dev', 'https://*.oina.pages.dev'];
+  it('allows the production and preview origins', () => {
+    expect(originAllowed('https://oina.geekio.org', rules)).toBe(true);
+    expect(originAllowed('https://oina.pages.dev', rules)).toBe(true);
+    expect(originAllowed('https://abc123.oina.pages.dev', rules)).toBe(true);
+    expect(originAllowed('http://localhost:5173', rules)).toBe(true);
+  });
+  it('rejects look-alikes', () => {
+    expect(originAllowed('https://evil.dev', rules)).toBe(false);
+    expect(originAllowed('https://eviloina.pages.dev', rules)).toBe(false);
+    expect(originAllowed('http://oina.geekio.org', rules)).toBe(false);
+    expect(originAllowed('https://oina.geekio.org.evil.dev', rules)).toBe(false);
   });
 });

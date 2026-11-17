@@ -12,12 +12,23 @@ const DAY = 86400;
 
 const isLocal = (origin: string) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
 
+/** Matches an origin against the allowlist. "https://*.example.dev" allows any subdomain. */
+export function originAllowed(origin: string, allowed: string[]): boolean {
+  if (isLocal(origin)) return true;
+  return allowed.some((rule) => {
+    const r = rule.replace(/\/+$/, '');
+    if (r === origin) return true;
+    const m = /^(https?:\/\/)\*\.(.+)$/.exec(r);
+    return !!m && origin.startsWith(m[1]!) && origin.endsWith('.' + m[2]!) && !origin.slice(m[1]!.length).includes('/');
+  });
+}
+
 export const app = new Hono<{ Bindings: Env }>();
 
 app.use('/api/*', async (c, next) => {
   const allowed = (c.env?.ALLOWED_ORIGINS ?? '').split(',').map((s) => s.trim()).filter(Boolean);
   return cors({
-    origin: (origin) => (origin && (isLocal(origin) || allowed.includes(origin)) ? origin : null),
+    origin: (origin) => (origin && originAllowed(origin, allowed) ? origin : null),
     allowMethods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'POST'],
     maxAge: DAY,
   })(c, next);
