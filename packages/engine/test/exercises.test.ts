@@ -88,6 +88,18 @@ describe('distractors', () => {
   });
 });
 
+describe('ambiguous letters', () => {
+  it('sound-to-letter never offers a second letter that reads the same', () => {
+    const ctx = contextFor(idx, createProgress(T0), createRng(3), 's6-l3');
+    for (const l of idx.letters) {
+      const q = engine.soundToLetter(ctx, l);
+      const prompt = l.persian[0]!;
+      const alsoRight = q.options.filter((o) => o.id !== l.id && idx.letterById.get(o.id)!.persian.includes(prompt));
+      expect(alsoRight, l.id).toEqual([]);
+    }
+  });
+});
+
 describe('grading', () => {
   it('grades choices and records the wrong pick', () => {
     const ctx = contextFor(idx, createProgress(T0), createRng(1), 's2-l1');

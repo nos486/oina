@@ -1,0 +1,130 @@
+@import 'tailwindcss';
+@import '@fontsource/vazirmatn/400.css';
+@import '@fontsource/vazirmatn/600.css';
+@import '@fontsource/vazirmatn/800.css';
+@import '@fontsource/noto-sans/cyrillic-400.css';
+@import '@fontsource/noto-sans/cyrillic-ext-400.css';
+@import '@fontsource/noto-sans/cyrillic-700.css';
+@import '@fontsource/noto-sans/cyrillic-ext-700.css';
+@import '@fontsource/noto-sans/latin-400.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens. Colors flip in dark mode; components use the Tailwind names below. */
+:root {
+  --bg: #faf6ee;
+  --surface: #ffffff;
+  --surface-2: #f1ebdf;
+  --ink: #1d2a2c;
+  --muted: #5f6b6d;
+  --line: #e4dccd;
+  --primary: #0f9b97;
+  --primary-ink: #ffffff;
+  --primary-soft: #d5f0ee;
+  --good: #2f9e44;
+  --good-soft: #dff3e2;
+  --bad: #d6453d;
+  --bad-soft: #fbe3e1;
+  --cat-friend: #2f9e44;
+  --cat-trap: #e8590c;
+  --cat-new: #1c7ed6;
+  --cat-tajik: #7048e8;
+  --cat-other: #868e96;
+  --gold: #f2b01e;
+  color-scheme: light;
+}
+.dark {
+  --bg: #101618;
+  --surface: #182124;
+  --surface-2: #212c30;
+  --ink: #ecf1f1;
+  --muted: #9aa8aa;
+  --line: #2c393d;
+  --primary: #2cc5bf;
+  --primary-ink: #062221;
+  --primary-soft: #143a39;
+  --good: #51cf66;
+  --good-soft: #17331d;
+  --bad: #ff6b6b;
+  --bad-soft: #3a1b1b;
+  --cat-friend: #51cf66;
+  --cat-trap: #ff922b;
+  --cat-new: #4dabf7;
+  --cat-tajik: #9775fa;
+  --cat-other: #adb5bd;
+  --gold: #ffd43b;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-cat-friend: var(--cat-friend);
+  --color-cat-trap: var(--cat-trap);
+  --color-cat-new: var(--cat-new);
+  --color-cat-tajik: var(--cat-tajik);
+  --color-cat-other: var(--cat-other);
+  --color-gold: var(--gold);
+  --font-fa: 'Vazirmatn', system-ui, sans-serif;
+  --font-cyr: 'Noto Sans', 'Vazirmatn', system-ui, sans-serif;
+}
+
+html {
+  font-size: calc(16px * var(--font-scale, 1));
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-fa);
+  min-height: 100dvh;
+}
+.cyr {
+  font-family: var(--font-cyr);
+  unicode-bidi: isolate;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(540deg); }
+}
+.animate-pop { animation: pop 0.25s ease-out; }
+.animate-slide-up { animation: slide-up 0.2s ease-out; }
+.animate-shake { animation: shake 0.3s ease-in-out; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop, .animate-slide-up, .animate-shake { animation: none; }
+}

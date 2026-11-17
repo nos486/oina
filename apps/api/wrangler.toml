@@ -1,0 +1,23 @@
+# Cloudflare Worker for the Oina API. Deploy with: pnpm deploy:api (runs `wrangler deploy`).
+name = "oina-api"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Comma-separated origins allowed by CORS. Add your Pages domain(s) here.
+# localhost is always allowed for development.
+ALLOWED_ORIGINS = "https://oina.pages.dev"
+
+# Audio from R2 (optional). Create the bucket first:
+#   npx wrangler r2 bucket create oina-audio
+# then uncomment this block and upload files with the same paths as apps/web/public/audio.
+# [[r2_buckets]]
+# binding = "AUDIO"
+# bucket_name = "oina-audio"
+
+# Later, for accounts and progress sync (v2):
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "oina"
+# database_id = "<from `wrangler d1 create oina`>"

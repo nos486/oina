@@ -161,6 +161,8 @@ export function soundToLetter(ctx: Ctx, letter: Letter): ChoiceQuestion {
   // Only letters the user has met may appear (lesson 1 therefore has 3 options, not 4).
   const wrong = [...new Set(ids)]
     .filter((id) => id !== letter.id && ctx.knownLetters.has(id) && ctx.index.letterById.has(id))
+    // A letter that also reads as the prompt (е/й/ӣ all read «ی») would be a second right answer.
+    .filter((id) => !ctx.index.letterById.get(id)!.persian.includes(letter.persian[0]!))
     .slice(0, 3);
   const options = shuffle([letter.id, ...wrong], ctx.rng).map((id) => {
     const l = ctx.index.letterById.get(id)!;

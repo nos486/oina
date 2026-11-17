@@ -1,0 +1,15 @@
+{
+  "name": "آینه · Оина",
+  "short_name": "آینه",
+  "description": "فارسی را با خطی دیگر بخوان",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf6ee",
+  "theme_color": "#0f9b97",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
