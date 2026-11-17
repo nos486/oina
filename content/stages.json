@@ -1,0 +1,97 @@
+[
+  {
+    "id": 1,
+    "titleFa": "اولین کلمه‌ها",
+    "descriptionFa": "با سه حرف اول «нон» یعنی نان را می‌خوانی",
+    "track": "tg",
+    "lessons": [
+      "s1-l1",
+      "s1-l2",
+      "s1-l3"
+    ]
+  },
+  {
+    "id": 2,
+    "titleFa": "فریبکارها",
+    "descriptionFa": "حرف‌هایی که شکل لاتین دارند ولی صدای دیگر",
+    "track": "tg",
+    "lessons": [
+      "s2-l1",
+      "s2-l2",
+      "s2-l3",
+      "s2-l4"
+    ]
+  },
+  {
+    "id": 3,
+    "titleFa": "حروف تازه‌ی ساده",
+    "descriptionFa": "شکل‌های تازه با صداهای آشنا",
+    "track": "tg",
+    "lessons": [
+      "s3-l1",
+      "s3-l2",
+      "s3-l3",
+      "s3-l4"
+    ]
+  },
+  {
+    "id": 4,
+    "titleFa": "شکل‌های عجیب",
+    "descriptionFa": "Ф Ш Ч Ж Й Э",
+    "track": "tg",
+    "lessons": [
+      "s4-l1",
+      "s4-l2",
+      "s4-l3",
+      "s4-l4"
+    ]
+  },
+  {
+    "id": 5,
+    "titleFa": "حروف ویژه‌ی تاجیکی",
+    "descriptionFa": "قاعده‌ی دُم و خط: Ҷ Ҳ Қ Ғ Ӣ Ӯ",
+    "track": "tg",
+    "lessons": [
+      "s5-l1",
+      "s5-l2",
+      "s5-l3",
+      "s5-l4",
+      "s5-l5"
+    ]
+  },
+  {
+    "id": 6,
+    "titleFa": "یاها و علامت‌ها",
+    "descriptionFa": "Я Ё Ю Ъ و خواندن اسم شهرها",
+    "track": "tg",
+    "lessons": [
+      "s6-l1",
+      "s6-l2",
+      "s6-l3"
+    ]
+  },
+  {
+    "id": 7,
+    "titleFa": "قواعد خواندن",
+    "descriptionFa": "اضافه، جمع، «را» و «می» چسبیده",
+    "track": "tg",
+    "lessons": [],
+    "comingSoon": true
+  },
+  {
+    "id": 8,
+    "titleFa": "خواندن واقعی",
+    "descriptionFa": "تابلو، منو، تیتر خبر و شعر",
+    "track": "tg",
+    "lessons": [],
+    "comingSoon": true
+  },
+  {
+    "id": 9,
+    "titleFa": "مسیر روسی",
+    "descriptionFa": "Ы Ц Щ Ь و تابلوهای شهری",
+    "track": "ru",
+    "lessons": [],
+    "comingSoon": true
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "name": "oina",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Oina (Оина): learn to read Tajik Cyrillic as a Persian speaker",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @oina/web --filter @oina/api dev",
+    "dev:web": "pnpm --filter @oina/web dev",
+    "dev:api": "pnpm --filter @oina/api dev",
+    "build": "pnpm content:validate && pnpm -r build",
+    "build:web": "pnpm --filter @oina/web build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter @oina/web test:e2e",
+    "content:validate": "tsx scripts/validate-content.ts",
+    "content:sync": "tsx scripts/sync-word-letters.ts",
+    "audio:list": "tsx scripts/generate-audio-list.ts",
+    "deploy:api": "pnpm --filter @oina/api deploy"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.3",
+    "@oina/shared": "workspace:*",
+    "@oina/engine": "workspace:*"
+  }
+}

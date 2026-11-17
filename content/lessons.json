@@ -1,0 +1,483 @@
+[
+  {
+    "id": "s1-l1",
+    "stageId": 1,
+    "titleFa": "نان و نام",
+    "newLetters": [
+      "n",
+      "o",
+      "m"
+    ],
+    "words": [
+      "non",
+      "nom",
+      "mo",
+      "omon"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s1-l2",
+    "stageId": 1,
+    "titleFa": "من و کم",
+    "newLetters": [
+      "a",
+      "k"
+    ],
+    "words": [
+      "man",
+      "kam",
+      "kom",
+      "kon",
+      "nam",
+      "makon",
+      "non",
+      "nom"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s1-l3",
+    "stageId": 1,
+    "titleFa": "تمام",
+    "newLetters": [
+      "t"
+    ],
+    "words": [
+      "tan",
+      "tamom",
+      "mat",
+      "tok",
+      "omonat",
+      "katon",
+      "man",
+      "kam"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "ман нон",
+      "persian": "من نان"
+    }
+  },
+  {
+    "id": "s2-l1",
+    "stageId": 2,
+    "titleFa": "سر و کار",
+    "newLetters": [
+      "r",
+      "s"
+    ],
+    "words": [
+      "sar",
+      "kor",
+      "mor",
+      "anor",
+      "rost",
+      "tar",
+      "sarmo",
+      "tars"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s2-l2",
+    "stageId": 2,
+    "titleFa": "نو و خانه",
+    "newLetters": [
+      "v",
+      "kh"
+    ],
+    "words": [
+      "nav",
+      "khona",
+      "khoma",
+      "khasta",
+      "sakht",
+      "ravon",
+      "khovar",
+      "khar"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "Ман хаста",
+      "persian": "من خسته"
+    }
+  },
+  {
+    "id": "s2-l3",
+    "stageId": 2,
+    "titleFa": "سرخ و خرما",
+    "newLetters": [
+      "u"
+    ],
+    "words": [
+      "surkh",
+      "khurmo",
+      "khuroson",
+      "tut",
+      "sutun",
+      "nomus",
+      "rustam",
+      "tus"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s2-l4",
+    "stageId": 2,
+    "titleFa": "میوه",
+    "newLetters": [
+      "ye"
+    ],
+    "words": [
+      "meva",
+      "se",
+      "nest",
+      "ser",
+      "resmon",
+      "meros",
+      "kor",
+      "khona"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "мева нест",
+      "persian": "میوه نیست"
+    }
+  },
+  {
+    "id": "s3-l1",
+    "stageId": 3,
+    "titleFa": "باد و آب",
+    "newLetters": [
+      "b",
+      "d"
+    ],
+    "words": [
+      "bod",
+      "ob",
+      "dard",
+      "bodom",
+      "dast",
+      "badan",
+      "obod",
+      "barodar"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s3-l2",
+    "stageId": 3,
+    "titleFa": "لب و پل",
+    "newLetters": [
+      "l",
+      "p"
+    ],
+    "words": [
+      "lab",
+      "pul",
+      "lola",
+      "pukhta",
+      "sol",
+      "parvona",
+      "balkh",
+      "palos"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s3-l3",
+    "stageId": 3,
+    "titleFa": "زبان و بازار",
+    "newLetters": [
+      "z",
+      "g"
+    ],
+    "words": [
+      "zan",
+      "gap",
+      "zabon",
+      "bozor",
+      "gurg",
+      "toza",
+      "garm",
+      "sabz"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s3-l4",
+    "stageId": 3,
+    "titleFa": "دل و کتاب",
+    "newLetters": [
+      "i"
+    ],
+    "words": [
+      "dil",
+      "kitob",
+      "in",
+      "zinda",
+      "khirs",
+      "sim",
+      "bukhoro",
+      "oina"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "гули сурх",
+      "persian": "گل سرخ"
+    }
+  },
+  {
+    "id": "s4-l1",
+    "stageId": 4,
+    "titleFa": "کفش و شب",
+    "newLetters": [
+      "f",
+      "sh"
+    ],
+    "words": [
+      "kafsh",
+      "shab",
+      "barf",
+      "daftar",
+      "shir",
+      "shash",
+      "shom",
+      "sheroz"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s4-l2",
+    "stageId": 4,
+    "titleFa": "چشم و ژاله",
+    "newLetters": [
+      "ch",
+      "zh"
+    ],
+    "words": [
+      "chashm",
+      "chor",
+      "charkh",
+      "chiz",
+      "chin",
+      "zhola",
+      "mizha",
+      "kharbuza"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "чор кафш",
+      "persian": "چهار کفش"
+    }
+  },
+  {
+    "id": "s4-l3",
+    "stageId": 4,
+    "titleFa": "چای",
+    "newLetters": [
+      "y"
+    ],
+    "words": [
+      "choy",
+      "poy",
+      "nay",
+      "poytakht",
+      "roygon",
+      "sayr",
+      "zaytun",
+      "maydon"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s4-l4",
+    "stageId": 4,
+    "titleFa": "ایران",
+    "newLetters": [
+      "e"
+    ],
+    "words": [
+      "eron",
+      "eshon",
+      "ey",
+      "zebo",
+      "khurshed",
+      "darvesh",
+      "farzand",
+      "eroni-zebo"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "Эрони зебо",
+      "persian": "ایران زیبا"
+    }
+  },
+  {
+    "id": "s5-l1",
+    "stageId": 5,
+    "titleFa": "جان و جهان",
+    "newLetters": [
+      "j",
+      "h"
+    ],
+    "words": [
+      "jon",
+      "jahon",
+      "javon",
+      "jashn",
+      "haft",
+      "havo",
+      "shahr",
+      "roh",
+      "moh"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s5-l2",
+    "stageId": 5,
+    "titleFa": "قند و قلم",
+    "newLetters": [
+      "q"
+    ],
+    "words": [
+      "qand",
+      "qalam",
+      "qadam",
+      "vaqt",
+      "aql",
+      "qissa",
+      "qoshuq",
+      "haq"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s5-l3",
+    "stageId": 5,
+    "titleFa": "باغ",
+    "newLetters": [
+      "gh"
+    ],
+    "words": [
+      "bogh",
+      "murgh",
+      "gham",
+      "charogh",
+      "ghazal",
+      "ghor",
+      "gharb",
+      "ghuncha"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s5-l4",
+    "stageId": 5,
+    "titleFa": "فارسی",
+    "newLetters": [
+      "ii"
+    ],
+    "words": [
+      "forsi",
+      "tojiki",
+      "bini",
+      "shodi",
+      "ki",
+      "chi",
+      "zindagi",
+      "sabzi"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s5-l5",
+    "stageId": 5,
+    "titleFa": "دوست",
+    "newLetters": [
+      "uu"
+    ],
+    "words": [
+      "dust",
+      "ruz",
+      "kuh",
+      "rud",
+      "gush",
+      "kucha",
+      "navruz",
+      "rudaki"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "дӯсти ман",
+      "persian": "دوست من"
+    }
+  },
+  {
+    "id": "s6-l1",
+    "stageId": 6,
+    "titleFa": "یار و دریا",
+    "newLetters": [
+      "ya",
+      "yo"
+    ],
+    "words": [
+      "yor",
+      "daryo",
+      "dunyo",
+      "soya",
+      "yazd",
+      "yod",
+      "bisyor",
+      "siyoh"
+    ],
+    "exercises": []
+  },
+  {
+    "id": "s6-l2",
+    "stageId": 6,
+    "titleFa": "شعر و معنا",
+    "newLetters": [
+      "yu",
+      "hard"
+    ],
+    "words": [
+      "sher",
+      "bad",
+      "mano",
+      "shula",
+      "rad",
+      "yunon",
+      "yusuf",
+      "tamir"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "шеъри форсӣ",
+      "persian": "شعر فارسی"
+    }
+  },
+  {
+    "id": "s6-l3",
+    "stageId": 6,
+    "titleFa": "تاجیکستان",
+    "newLetters": [],
+    "words": [
+      "tojikiston",
+      "dushanbe",
+      "samarqand",
+      "khujand",
+      "hofiz",
+      "firdavsi",
+      "sadi",
+      "khiyoboni-rudaki"
+    ],
+    "exercises": [],
+    "miniReading": {
+      "cyrillic": "Ман форсӣ мехонам",
+      "persian": "من فارسی می‌خوانم"
+    }
+  }
+]
