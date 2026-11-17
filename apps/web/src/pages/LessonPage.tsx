@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { SessionState } from '@oina/engine';
 import {
-  accuracy, addXp, awardBadges, BADGES, completeLesson, contextFor, createRng, generateLessonQuestions,
+  accuracy, addXp, awardBadges, BADGES, completeLesson, levelForXp, contextFor, createRng, generateLessonQuestions,
   letterKey, nextLevel, weakestItems,
 } from '@oina/engine';
 import { audioPath } from '@oina/shared';
@@ -17,7 +17,7 @@ import { Confetti } from '../components/Confetti';
 import { fxFinish } from '../lib/fx';
 import { n, pct } from '../lib/format';
 
-type Phase = { kind: 'intro'; i: number } | { kind: 'session' } | { kind: 'result'; s: SessionState; badges: string[] };
+type Phase = { kind: 'intro'; i: number } | { kind: 'session' } | { kind: 'result'; s: SessionState; badges: string[]; levelUp: number | null };
 
 export function LessonPage() {
   const { id = '' } = useParams();
@@ -71,21 +71,23 @@ export function LessonPage() {
         onComplete={(s) => {
           const now = new Date();
           let earned: string[] = [];
+          const levelBefore = levelForXp(progressStore.get().xp);
           progressStore.update((p) => {
-            let next = completeLesson(p, lesson.id, level, s.wrongCount === 0);
+            let next = completeLesson(p, lesson.id, level);
             next = addXp(next, s.xp, now);
             const r = awardBadges(next, index, now);
             earned = r.earned;
             return r.progress;
           });
           fxFinish(progressStore.get().settings.sound);
-          setPhase({ kind: 'result', s, badges: earned });
+          const levelAfter = levelForXp(progressStore.get().xp);
+          setPhase({ kind: 'result', s, badges: earned, levelUp: levelAfter > levelBefore ? levelAfter : null });
         }}
       />
     );
   }
 
-  const { s, badges } = phase;
+  const { s, badges, levelUp } = phase;
   const now = new Date();
   const p = progressStore.get();
   const weak = weakestItems(p, [...new Set([...s.missed.filter((k) => k.startsWith('letter:')), ...lesson.newLetters.map(letterKey)])], now, 3, 50)
@@ -108,6 +110,11 @@ export function LessonPage() {
         <Card><div className="text-2xl font-extrabold text-good">{pct(accuracy(s))}</div><div className="text-sm text-muted">دقت</div></Card>
         <Card><div className="text-2xl font-extrabold text-cat-trap">{n(s.bestCombo)}</div><div className="text-sm text-muted">بیشترین کمبو</div></Card>
       </div>
+      {levelUp && (
+        <Card className="mb-4 text-center">
+          <p className="text-lg font-extrabold text-primary">رسیدی به سطح {n(levelUp)}! 🎉</p>
+        </Card>
+      )}
       {badges.length > 0 && (
         <Card className="mb-4 text-center">
           <p className="font-bold">نشان تازه: {badges.map((b) => BADGES.find((x) => x.id === b)?.titleFa).join('، ')} 🏅</p>

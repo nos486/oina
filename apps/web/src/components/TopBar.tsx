@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { MAX_HEARTS, currentStreak, xpToday } from '@oina/engine';
+import { MAX_HEARTS, currentStreak, levelForXp, totalStars, xpToday } from '@oina/engine';
 import { useProgress } from '../state/progress';
 import { n } from '../lib/format';
 
@@ -29,7 +29,8 @@ export function TopBar() {
         </div>
         <div className="flex items-center gap-3 text-sm font-semibold">
           <span aria-label={`روزشمار: ${n(streak)} روز`} className={streak ? 'text-cat-trap' : 'text-muted'}>🔥 {n(streak)}</span>
-          <span aria-label={`سکه: ${n(p.gems)}`}>🪙 {n(p.gems)}</span>
+          <span aria-label={`ستاره: ${n(totalStars(p))}`}>⭐ {n(totalStars(p))}</span>
+          <span aria-label={`سطح ${n(levelForXp(p.xp))}`} className="rounded-lg bg-primary-soft px-1.5 text-primary">سطح {n(levelForXp(p.xp))}</span>
           {p.settings.hearts && (
             <span aria-label={`جان: ${n(p.hearts.count)} از ${n(MAX_HEARTS)}`} className="text-bad">♥ {n(p.hearts.count)}</span>
           )}

@@ -30,11 +30,9 @@ export function createProgress(now: Date = new Date()): Progress {
     recentMistakes: [],
     lessonLevels: {},
     hearts: { count: MAX_HEARTS, lastRefill: now.toISOString() },
-    gems: 0,
     dailyGoal: 20,
     xpByDay: {},
     badges: [],
-    streakFreezes: 0,
     xp: 0,
     streak: { count: 0, lastDay: '' },
     settings: { ...DEFAULT_SETTINGS },
@@ -65,11 +63,9 @@ export function normalizeProgress(raw: unknown, now: Date = new Date()): Progres
     hearts: isObj(p.hearts)
       ? { count: Math.min(MAX_HEARTS, Math.max(0, num(p.hearts.count, MAX_HEARTS))), lastRefill: String(p.hearts.lastRefill ?? base.hearts.lastRefill) }
       : base.hearts,
-    gems: num(p.gems, 0),
     dailyGoal: p.dailyGoal === 50 || p.dailyGoal === 100 ? p.dailyGoal : 20,
     xpByDay: isObj(p.xpByDay) ? (p.xpByDay as Progress['xpByDay']) : {},
     badges: arr(p.badges),
-    streakFreezes: num(p.streakFreezes, 0),
     xp: num(p.xp, 0),
     streak: isObj(p.streak) ? { count: num(p.streak.count, 0), lastDay: String(p.streak.lastDay ?? '') } : base.streak,
     settings: { ...DEFAULT_SETTINGS, ...(isObj(p.settings) ? p.settings : {}) },
@@ -102,6 +98,5 @@ export function mergeProgress(a: Progress, b: Progress): Progress {
     xpByDay: maxRecord(a.xpByDay, b.xpByDay),
     badges: [...new Set([...a.badges, ...b.badges])],
     xp: Math.max(a.xp, b.xp),
-    gems: Math.max(a.gems, b.gems),
   };
 }

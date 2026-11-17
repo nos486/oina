@@ -127,7 +127,7 @@ Or build locally and upload: `pnpm build:web && npx wrangler pages deploy apps/w
 - Smart review: wrong answers come back at the end of the lesson in another form; item strength with decay;
   Leitner boxes (1, 2, 4, 7, 14 days); confusion pairs feed the wrong options; 30% review in new lessons;
   daily review by priority; "my mistakes" practice.
-- XP, combo, daily goal, streak with freezes, hearts (can be turned off), coins (earned only, never sold), badges.
+- XP, combo, daily goal, streak, hearts (can be turned off), levels from XP, stars, badges (no currency: the app is free).
 - Alphabet hall, settings, progress export/import as JSON.
 
 Next (v1.1): stages 7–8, exercises 7–10, reading room, Cyrillic → Persian converter, offline service worker.

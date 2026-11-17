@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  DAY_MS, HEART_REFILL_MS, addXp, awardBadges, spendCoins, canStartLesson, completeLesson, completeStageTest, createProgress,
+  DAY_MS, HEART_REFILL_MS, addXp, awardBadges, canStartLesson, levelForXp, levelInfo, totalStars, xpForLevel, completeLesson, completeStageTest, createProgress,
   currentStreak, gainHeart, loseHeart, mergeProgress, nextHeartIn, nextLevel, normalizeProgress, refillHearts, starsForScore,
 } from '../src/index.js';
 import { T0, later, realIndex } from './fixtures.js';
@@ -16,15 +16,12 @@ describe('xp and streak', () => {
     expect(p.xp).toBe(40);
   });
 
-  it('resets after a missed day, unless a freeze covers it', () => {
-    let p = addXp(createProgress(T0), 20, T0);
+  it('resets after a missed day', () => {
+    const p = addXp(createProgress(T0), 20, T0);
     const t2 = later(T0, 2 * DAY_MS);
+    expect(currentStreak(p, later(T0, DAY_MS))).toBe(1);
+    expect(currentStreak(p, t2)).toBe(0);
     expect(addXp(p, 20, t2).streak.count).toBe(1);
-    p = { ...p, streakFreezes: 1 };
-    expect(currentStreak(p, t2)).toBe(1);
-    const q = addXp(p, 20, t2);
-    expect(q.streak.count).toBe(2);
-    expect(q.streakFreezes).toBe(0);
   });
 });
 
@@ -48,11 +45,12 @@ describe('hearts', () => {
 });
 
 describe('lessons, stars, shop', () => {
-  it('tracks lesson level and gems', () => {
-    let p = completeLesson(createProgress(T0), 's1-l1', 1, true);
-    expect(p.gems).toBe(10);
+  it('tracks lesson level and stars', () => {
+    let p = completeLesson(createProgress(T0), 's1-l1', 1);
     expect(nextLevel(p, 's1-l1')).toBe(2);
-    p = completeLesson(p, 's1-l1', 3, false);
+    expect(totalStars(p)).toBe(1);
+    p = completeLesson(p, 's1-l1', 3);
+    expect(totalStars(p)).toBe(3);
     expect(nextLevel(p, 's1-l1')).toBe(3);
     expect(p.completedLessons).toEqual(['s1-l1']);
   });
@@ -65,16 +63,15 @@ describe('lessons, stars, shop', () => {
     expect(p.completedLessons).toEqual(['s1-l1', 's1-l2', 's1-l3']);
   });
 
-  it('spends earned coins on a streak freeze', () => {
-    expect(spendCoins(createProgress(T0), 'streakFreeze')).toBeNull();
-    const p = spendCoins({ ...createProgress(T0), gems: 60 }, 'streakFreeze')!;
-    expect(p.streakFreezes).toBe(1);
-    expect(p.gems).toBe(10);
+  it('turns XP into levels', () => {
+    expect([0, 49, 50, 199, 200, 450].map(levelForXp)).toEqual([1, 1, 2, 2, 3, 4]);
+    expect(xpForLevel(5)).toBe(800);
+    expect(levelInfo(125)).toEqual({ level: 2, current: 50, next: 200, fraction: 0.5 });
   });
 
   it('awards badges once', () => {
     const idx = realIndex();
-    const p = completeLesson(createProgress(T0), 's1-l1', 1, false);
+    const p = completeLesson(createProgress(T0), 's1-l1', 1);
     const r = awardBadges(p, idx, T0);
     expect(r.earned).toEqual(['first-word']);
     expect(awardBadges(r.progress, idx, T0).earned).toEqual([]);
@@ -92,8 +89,8 @@ describe('progress storage', () => {
   });
 
   it('merges two devices with "most progress wins"', () => {
-    const a = { ...completeLesson(createProgress(T0), 's1-l1', 2, false), xp: 100 };
-    const b = { ...completeLesson(createProgress(T0), 's1-l2', 1, false), xp: 40 };
+    const a = { ...completeLesson(createProgress(T0), 's1-l1', 2), xp: 100 };
+    const b = { ...completeLesson(createProgress(T0), 's1-l2', 1), xp: 40 };
     const m = mergeProgress(a, b);
     expect(m.completedLessons.sort()).toEqual(['s1-l1', 's1-l2']);
     expect(m.xp).toBe(100);

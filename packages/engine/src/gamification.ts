@@ -1,4 +1,7 @@
-/** XP, daily goal, streak, hearts, gems, stars and badges. Pure functions over Progress. */
+/**
+ * XP and levels, daily goal, streak, hearts, stars and badges. Pure functions over Progress.
+ * The app is free and has no currency: rewards are XP (→ level), stars and badges.
+ */
 import type { Progress } from '@oina/shared';
 import type { ContentIndex } from './content-index.js';
 import { dayKey, daysBetween } from './time.js';
@@ -6,42 +9,31 @@ import { MAX_HEARTS, letterKey, wordKey } from './progress.js';
 import { effectiveStrength } from './review-engine.js';
 
 export const HEART_REFILL_MS = 30 * 60 * 1000;
-export const GEMS_PER_LESSON = 5;
-export const GEMS_PERFECT_BONUS = 5;
-export const STREAK_FREEZE_COST = 50;
-export const HEART_REFILL_COST = 30;
 export const STAGE_TEST_PASS = 0.8;
 
 export function xpToday(progress: Progress, now: Date): number {
   return progress.xpByDay[dayKey(now)] ?? 0;
 }
 
-/**
- * Adds XP and updates the streak. The streak counts a day once the daily goal is reached.
- * Missed days are covered by streak freezes when the user has enough of them.
- */
+/** Adds XP and updates the streak. The streak counts a day once the daily goal is reached. */
 export function addXp(progress: Progress, amount: number, now: Date): Progress {
   if (amount <= 0) return progress;
   const today = dayKey(now);
   const todayXp = (progress.xpByDay[today] ?? 0) + amount;
-  let { streak, streakFreezes } = progress;
+  let { streak } = progress;
   if (todayXp >= progress.dailyGoal && streak.lastDay !== today) {
     const gap = streak.lastDay ? daysBetween(streak.lastDay, today) : Infinity;
-    if (gap === 1) streak = { count: streak.count + 1, lastDay: today };
-    else if (gap !== Infinity && gap - 1 <= streakFreezes) {
-      streakFreezes -= gap - 1;
-      streak = { count: streak.count + 1, lastDay: today };
-    } else streak = { count: 1, lastDay: today };
+    streak = { count: gap === 1 ? streak.count + 1 : 1, lastDay: today };
   }
-  return { ...progress, xp: progress.xp + amount, xpByDay: { ...progress.xpByDay, [today]: todayXp }, streak, streakFreezes };
+  return { ...progress, xp: progress.xp + amount, xpByDay: { ...progress.xpByDay, [today]: todayXp }, streak };
 }
 
-/** The streak shown in the UI: 0 if the user missed more days than freezes can cover. */
+/** The streak shown in the UI: 0 once a whole day was missed. */
 export function currentStreak(progress: Progress, now: Date): number {
   const { lastDay, count } = progress.streak;
   if (!lastDay) return 0;
   const gap = daysBetween(lastDay, dayKey(now));
-  return gap <= 1 + progress.streakFreezes ? count : 0;
+  return gap <= 1 ? count : 0;
 }
 
 /** +1 heart for every 30 minutes since the last refill. */
@@ -78,13 +70,12 @@ export function canStartLesson(progress: Progress, now: Date): boolean {
   return !progress.settings.hearts || refillHearts(progress, now).hearts.count > 0;
 }
 
-export function completeLesson(progress: Progress, lessonId: string, level: 1 | 2 | 3, perfect: boolean): Progress {
+export function completeLesson(progress: Progress, lessonId: string, level: 1 | 2 | 3): Progress {
   const prevLevel = progress.lessonLevels[lessonId] ?? 0;
   return {
     ...progress,
     completedLessons: progress.completedLessons.includes(lessonId) ? progress.completedLessons : [...progress.completedLessons, lessonId],
     lessonLevels: { ...progress.lessonLevels, [lessonId]: Math.max(prevLevel, level) as 0 | 1 | 2 | 3 },
-    gems: progress.gems + GEMS_PER_LESSON + (perfect ? GEMS_PERFECT_BONUS : 0),
   };
 }
 
@@ -107,20 +98,38 @@ export function completeStageTest(progress: Progress, index: ContentIndex, stage
   let p: Progress = { ...progress, stageStars: { ...progress.stageStars, [stageId]: Math.max(prev, stars) as 0 | 1 | 2 | 3 } };
   if (stars > 0) {
     const lessons = index.stageById.get(stageId)?.lessons ?? [];
-    p = { ...p, completedLessons: [...new Set([...p.completedLessons, ...lessons])], gems: p.gems + 10 * stars };
+    p = { ...p, completedLessons: [...new Set([...p.completedLessons, ...lessons])] };
   }
   return p;
 }
 
-/**
- * Spends earned coins (Progress.gems) inside the app. The app is free: coins are only earned by
- * learning and can never be bought.
- */
-export function spendCoins(progress: Progress, what: 'streakFreeze' | 'hearts'): Progress | null {
-  const price = what === 'streakFreeze' ? STREAK_FREEZE_COST : HEART_REFILL_COST;
-  if (progress.gems < price) return null;
-  if (what === 'streakFreeze') return { ...progress, gems: progress.gems - price, streakFreezes: progress.streakFreezes + 1 };
-  return { ...progress, gems: progress.gems - price, hearts: { count: MAX_HEARTS, lastRefill: new Date().toISOString() } };
+// ---------- level and stars ----------
+
+/** XP needed to reach a level: 0, 50, 200, 450, 800, … (50 × (level − 1)²). */
+export function xpForLevel(level: number): number {
+  return 50 * (level - 1) ** 2;
+}
+
+export function levelForXp(xp: number): number {
+  return Math.floor(Math.sqrt(Math.max(0, xp) / 50)) + 1;
+}
+
+/** Level and how far the user is towards the next one (0..1). */
+export function levelInfo(xp: number): { level: number; current: number; next: number; fraction: number } {
+  const level = levelForXp(xp);
+  const current = xpForLevel(level);
+  const next = xpForLevel(level + 1);
+  return { level, current, next, fraction: (xp - current) / (next - current) };
+}
+
+/** Stars collected: up to 3 per lesson (its levels) plus up to 3 per stage test. */
+export function totalStars(progress: Progress): number {
+  const sum = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0);
+  return sum(progress.lessonLevels) + sum(progress.stageStars as Record<string, number>);
+}
+
+export function maxStars(index: ContentIndex): number {
+  return index.lessons.length * 3 + index.stages.filter((s) => s.lessons.length).length * 3;
 }
 
 export interface BadgeDef {
