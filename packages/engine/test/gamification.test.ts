@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  DAY_MS, HEART_REFILL_MS, addXp, awardBadges, buy, canStartLesson, completeLesson, completeStageTest, createProgress,
+  DAY_MS, HEART_REFILL_MS, addXp, awardBadges, spendCoins, canStartLesson, completeLesson, completeStageTest, createProgress,
   currentStreak, gainHeart, loseHeart, mergeProgress, nextHeartIn, nextLevel, normalizeProgress, refillHearts, starsForScore,
 } from '../src/index.js';
 import { T0, later, realIndex } from './fixtures.js';
@@ -65,9 +65,9 @@ describe('lessons, stars, shop', () => {
     expect(p.completedLessons).toEqual(['s1-l1', 's1-l2', 's1-l3']);
   });
 
-  it('buys a streak freeze with gems', () => {
-    expect(buy(createProgress(T0), 'streakFreeze')).toBeNull();
-    const p = buy({ ...createProgress(T0), gems: 60 }, 'streakFreeze')!;
+  it('spends earned coins on a streak freeze', () => {
+    expect(spendCoins(createProgress(T0), 'streakFreeze')).toBeNull();
+    const p = spendCoins({ ...createProgress(T0), gems: 60 }, 'streakFreeze')!;
     expect(p.streakFreezes).toBe(1);
     expect(p.gems).toBe(10);
   });

@@ -1,15 +1,15 @@
 /**
- * Client side of sign-in. The token comes from the Worker (password login now, Google later)
+ * Client side of sign-in. The token comes from the Worker (username/password now, Google later)
  * and is sent as a Bearer token. Signing in is optional; the app works without an account.
  */
 import { useSyncExternalStore } from 'react';
-import type { AdminStats, AuthUser, LoginResponse } from '@oina/shared';
+import type { AdminStats, AuthUser, LoginResponse, MeResponse, ProgressResponse } from '@oina/shared';
 import { API_BASE } from './config';
 import { storage } from './storage';
 
 const KEY = 'session:v1';
 
-interface Session {
+export interface Session {
   token: string;
   expiresAt: string;
   user: AuthUser;
@@ -35,20 +35,23 @@ function save(s: Session | null) {
   emit();
 }
 
-export class AuthError extends Error {
+export class ApiCallError extends Error {
   constructor(message: string, readonly status: number) {
     super(message);
   }
 }
 
-async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function apiCall<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   headers.set('Accept', 'application/json');
   if (init.body) headers.set('Content-Type', 'application/json');
   if (session) headers.set('Authorization', `Bearer ${session.token}`);
   const res = await fetch(`${API_BASE}${path}`, { ...init, headers });
-  if (res.status === 401 && session) save(null);
-  if (!res.ok) throw new AuthError(`HTTP ${res.status}`, res.status);
+  if (res.status === 401 && session && !path.startsWith('/auth/login')) save(null);
+  if (!res.ok) {
+    const msg = ((await res.json().catch(() => null)) as { error?: string } | null)?.error ?? `HTTP ${res.status}`;
+    throw new ApiCallError(msg, res.status);
+  }
   return (await res.json()) as T;
 }
 
@@ -59,16 +62,25 @@ export const auth = {
     return () => listeners.delete(l);
   },
   async login(username: string, password: string): Promise<AuthUser> {
-    const r = await call<LoginResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+    const r = await apiCall<LoginResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
     save({ token: r.token, expiresAt: r.expiresAt, user: r.user });
     return r.user;
   },
-  logout() {
-    void call('/auth/logout', { method: 'POST' }).catch(() => undefined);
+  async register(username: string, password: string): Promise<AuthUser> {
+    const r = await apiCall<LoginResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ username, password }) });
+    save({ token: r.token, expiresAt: r.expiresAt, user: r.user });
+    return r.user;
+  },
+  /** Forgets the token on this device. */
+  clear() {
     save(null);
   },
-  me: () => call<{ user: AuthUser; defaultPassword: boolean }>('/auth/me'),
-  adminStats: () => call<AdminStats>('/admin/stats'),
+  me: () => apiCall<MeResponse>('/auth/me'),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    apiCall<{ ok: true }>('/auth/password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }),
+  adminStats: () => apiCall<AdminStats>('/admin/stats'),
+  getProgress: () => apiCall<ProgressResponse>('/progress'),
+  putProgress: (p: unknown, keepalive = false) => apiCall<ProgressResponse>('/progress', { method: 'PUT', body: JSON.stringify(p), keepalive }),
 };
 
 export function useSession(): Session | null {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import type { DailyGoal } from '@oina/shared';
 import { progressStore } from '../state/progress';
 import { Button, Page } from '../components/ui';
@@ -56,6 +56,7 @@ export function WelcomePage() {
           </div>
         </div>
         <Button className="mt-4 w-full" onClick={start}>شروع کنیم</Button>
+        <Link to="/login" className="font-semibold text-primary">حساب داری؟ وارد شو</Link>
       </div>
     </Page>
   );

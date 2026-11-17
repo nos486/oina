@@ -34,9 +34,7 @@ export function AdminPage() {
         <Card className="mb-4 border-bad bg-bad-soft">
           <p className="font-bold text-bad">رمز پیش‌فرض (admin) هنوز فعال است.</p>
           <p className="text-sm">
-            قبل از اشتراک‌گذاری سایت، در پوشه‌ی apps/api این دو دستور را بزن:{' '}
-            <code dir="ltr" className="block">npx wrangler secret put ADMIN_PASSWORD</code>
-            <code dir="ltr" className="block">npx wrangler secret put AUTH_SECRET</code>
+            قبل از اشتراک‌گذاری سایت رمز را عوض کن: <Link to="/tools" className="font-semibold text-primary">ابزار ← حساب کاربری ← تغییر رمز</Link>
           </p>
         </Card>
       )}
@@ -56,6 +54,26 @@ export function AdminPage() {
               </Card>
             ))}
           </div>
+          <Card className="mb-4">
+            <h2 className="mb-3 text-lg font-bold">کاربران ({n(stats.users ?? 0)})</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-muted">
+                  <tr><th className="py-1 text-start">نام کاربری</th><th className="text-start">درس</th><th className="text-start">امتیاز</th><th className="text-start">آخرین ذخیره</th></tr>
+                </thead>
+                <tbody>
+                  {stats.recentUsers.map((u) => (
+                    <tr key={u.id} className="border-t border-line">
+                      <td className="py-2" dir="ltr">{u.username ?? u.name}{u.roles.includes('admin') ? ' ★' : ''}</td>
+                      <td>{n(u.lessons)}</td>
+                      <td>{n(u.xp)}</td>
+                      <td className="text-muted">{u.lastProgressAt ? new Date(u.lastProgressAt).toLocaleDateString('fa-IR') : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
           <Card>
             <h2 className="mb-1 text-lg font-bold">کلمه‌هایی که بازبینی می‌خواهند ({n(stats.needsReview.length)})</h2>
             <p className="mb-3 text-sm text-muted">املای تاجیکی این‌ها باید توسط یک تاجیک‌زبان تأیید شود (content/words.json، فیلد needsReview).</p>

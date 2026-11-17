@@ -29,7 +29,7 @@ export function TopBar() {
         </div>
         <div className="flex items-center gap-3 text-sm font-semibold">
           <span aria-label={`روزشمار: ${n(streak)} روز`} className={streak ? 'text-cat-trap' : 'text-muted'}>🔥 {n(streak)}</span>
-          <span aria-label={`سکه: ${n(p.gems)}`}>💎 {n(p.gems)}</span>
+          <span aria-label={`سکه: ${n(p.gems)}`}>🪙 {n(p.gems)}</span>
           {p.settings.hearts && (
             <span aria-label={`جان: ${n(p.hearts.count)} از ${n(MAX_HEARTS)}`} className="text-bad">♥ {n(p.hearts.count)}</span>
           )}

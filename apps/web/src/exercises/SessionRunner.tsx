@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { Ctx, Grade, Question, Response, SessionMode, SessionState } from '@oina/engine';
-import { answer, applyAnswer, buy, currentQuestion, gainHeart, HEART_REFILL_PRICE, loseHeart, sessionProgress, startSession } from '@oina/engine';
+import { answer, applyAnswer, spendCoins, currentQuestion, gainHeart, HEART_REFILL_COST, loseHeart, sessionProgress, startSession } from '@oina/engine';
 import { Button, ProgressBar } from '../components/ui';
 import { Hoopoe } from '../components/Hoopoe';
 import { Cyr } from '../components/Cyr';
@@ -86,15 +86,15 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete }: Props
   }, []);
 
   if (outOfHearts) {
-    const canBuy = progress.gems >= HEART_REFILL_PRICE;
+    const canSpend = progress.gems >= HEART_REFILL_COST;
     return (
       <div className="mx-auto flex min-h-dvh max-w-[720px] flex-col items-center justify-center gap-4 p-6 text-center">
         <Hoopoe size={96} mood="sad" />
         <h2 className="text-2xl font-extrabold">جانت تمام شد</h2>
         <p className="text-muted">هر ۳۰ دقیقه یک جان پر می‌شود. با مرور هم جان می‌گیری؛ مرور هیچ‌وقت جان کم نمی‌کند.</p>
         <Button className="w-full" onClick={() => navigate('/review')}>مرور کن و جان بگیر</Button>
-        <Button variant="secondary" className="w-full" disabled={!canBuy} onClick={() => progressStore.update((p) => buy(p, 'hearts') ?? p)}>
-          پر کردن جان با {n(HEART_REFILL_PRICE)} 💎
+        <Button variant="secondary" className="w-full" disabled={!canSpend} onClick={() => progressStore.update((p) => spendCoins(p, 'hearts') ?? p)}>
+          پر کردن جان با {n(HEART_REFILL_COST)} سکه 🪙
         </Button>
         <Button variant="ghost" onClick={() => navigate('/')}>بازگشت به مسیر</Button>
       </div>

@@ -8,8 +8,8 @@ import { effectiveStrength } from './review-engine.js';
 export const HEART_REFILL_MS = 30 * 60 * 1000;
 export const GEMS_PER_LESSON = 5;
 export const GEMS_PERFECT_BONUS = 5;
-export const STREAK_FREEZE_PRICE = 50;
-export const HEART_REFILL_PRICE = 30;
+export const STREAK_FREEZE_COST = 50;
+export const HEART_REFILL_COST = 30;
 export const STAGE_TEST_PASS = 0.8;
 
 export function xpToday(progress: Progress, now: Date): number {
@@ -112,8 +112,12 @@ export function completeStageTest(progress: Progress, index: ContentIndex, stage
   return p;
 }
 
-export function buy(progress: Progress, what: 'streakFreeze' | 'hearts'): Progress | null {
-  const price = what === 'streakFreeze' ? STREAK_FREEZE_PRICE : HEART_REFILL_PRICE;
+/**
+ * Spends earned coins (Progress.gems) inside the app. The app is free: coins are only earned by
+ * learning and can never be bought.
+ */
+export function spendCoins(progress: Progress, what: 'streakFreeze' | 'hearts'): Progress | null {
+  const price = what === 'streakFreeze' ? STREAK_FREEZE_COST : HEART_REFILL_COST;
   if (progress.gems < price) return null;
   if (what === 'streakFreeze') return { ...progress, gems: progress.gems - price, streakFreezes: progress.streakFreezes + 1 };
   return { ...progress, gems: progress.gems - price, hearts: { count: MAX_HEARTS, lastRefill: new Date().toISOString() } };

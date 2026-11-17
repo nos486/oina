@@ -15,11 +15,15 @@ function load(): Progress {
 }
 
 let state: Progress = load();
+/** UI subscribers: told about every change. */
 const listeners = new Set<() => void>();
+/** Change subscribers (account sync): told only about changes made on this device. */
+const changeListeners = new Set<() => void>();
 
-function emit() {
+function emit(silent = false) {
   storage.set(PROGRESS_STORAGE_KEY, JSON.stringify(state));
   listeners.forEach((l) => l());
+  if (!silent) changeListeners.forEach((l) => l());
 }
 
 export const progressStore = {
@@ -32,17 +36,21 @@ export const progressStore = {
       emit();
     }
   },
-  replace(p: Progress) {
+  /** silent: the change came from the server, so do not push it back. */
+  replace(p: Progress, opts: { silent?: boolean } = {}) {
     state = p;
-    emit();
+    emit(opts.silent);
   },
   reset() {
     state = { ...createProgress(), onboarded: true, settings: state.settings };
-    emit();
+    emit(true);
   },
-  subscribe(l: () => void) {
-    listeners.add(l);
-    return () => listeners.delete(l);
+  subscribe(l: () => void, opts: { includeSilent?: boolean } = {}) {
+    const set = opts.includeSilent === false ? changeListeners : listeners;
+    set.add(l);
+    return () => {
+      set.delete(l);
+    };
   },
   exportJson: () => JSON.stringify(state, null, 2),
   importJson(text: string): boolean {

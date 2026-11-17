@@ -43,6 +43,7 @@ export interface Progress {
   recentMistakes: string[];
   lessonLevels: Record<string, 0 | 1 | 2 | 3>;
   hearts: { count: number; lastRefill: string };
+  /** In-app coins, earned by learning and spent in the app. Never purchasable (the app is free). */
   gems: number;
   dailyGoal: DailyGoal;
   /** "2026-11-17": 120 */

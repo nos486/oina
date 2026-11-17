@@ -58,24 +58,35 @@ Tajik audio comes from recorded files only (browsers have no Tajik voice). Until
 Later the files can move to R2: uncomment the `[[r2_buckets]]` block in `apps/api/wrangler.toml`,
 upload with the same paths, and set `VITE_AUDIO_BASE` to `https://<worker>/audio/`.
 
-## Sign-in (test login)
+## Accounts and saved progress (D1)
 
-Signing in is optional; the app works without an account. For now there is one admin account:
+Signing in is optional; without it progress stays in the browser only. With an account, progress
+(lessons, stars, XP, streak, item strengths, review boxes, mistakes) is saved to Cloudflare D1:
+merged in on sign-in and app start, and pushed ~1.5 s after every change. `localStorage` stays the
+working copy, so the app keeps working offline. Merging is "most progress wins" (lessons and badges are
+unioned, XP and stars take the max, each item keeps its most recent state).
 
-- Default: `admin` / `admin`, which the admin page warns about.
-- Set real values before sharing the site (from `apps/api`):
-  ```bash
-  npx wrangler secret put ADMIN_PASSWORD
-  npx wrangler secret put AUTH_SECRET     # any long random string; signs session tokens
-  npx wrangler secret put ADMIN_USERNAME  # optional, default "admin"
-  ```
-  Changing `AUTH_SECRET` or the password signs everyone out.
-- For `wrangler dev`, copy `apps/api/.dev.vars.example` to `.dev.vars`.
+- Default admin from the first migration: **admin / admin**. Change it in the app: Tools → Account → Change password.
+- Anyone can create a normal account (Tools → Sign in → Create account).
+- The session signing key is generated on first use and stored in D1 (`config` table); no secrets to set.
+  (Optional override: `npx wrangler secret put AUTH_SECRET`.)
 
-API: `POST /api/v1/auth/login` → `{ token, expiresAt, user }`; send `Authorization: Bearer <token>`;
-`GET /api/v1/auth/me`; `GET /api/v1/admin/stats` (admin only). Tokens are stateless HMAC-signed (30 days),
-so no database is needed yet. Google sign-in will be another provider in `apps/api/src/auth/providers.ts`
-behind the reserved `POST /api/v1/auth/google`, issuing the same token.
+### One-time D1 setup (from `apps/api`)
+
+```bash
+npx wrangler d1 create oina
+# copy the printed database_id into apps/api/wrangler.toml ([[d1_databases]] → database_id)
+npx wrangler d1 migrations apply oina --remote
+npx wrangler deploy
+```
+
+New migrations go in `apps/api/migrations/` and are applied the same way. For `wrangler dev`, run
+`npx wrangler d1 migrations apply oina --local` once.
+
+API: `POST /api/v1/auth/login` and `/auth/register` → `{ token, expiresAt, user }`; send `Authorization: Bearer <token>`.
+`GET /auth/me`, `POST /auth/password`, `GET|PUT /progress`, `GET /admin/stats` (admin only).
+Tables: `users`, `identities` (for Google later), `progress`, `config`. Google sign-in will verify a Google ID token
+behind the reserved `POST /auth/google`, link it in `identities`, and issue the same token.
 
 ## Deploy (manual)
 
@@ -116,8 +127,8 @@ Or build locally and upload: `pnpm build:web && npx wrangler pages deploy apps/w
 - Smart review: wrong answers come back at the end of the lesson in another form; item strength with decay;
   Leitner boxes (1, 2, 4, 7, 14 days); confusion pairs feed the wrong options; 30% review in new lessons;
   daily review by priority; "my mistakes" practice.
-- XP, combo, daily goal, streak with freezes, hearts (can be turned off), gems, badges.
+- XP, combo, daily goal, streak with freezes, hearts (can be turned off), coins (earned only, never sold), badges.
 - Alphabet hall, settings, progress export/import as JSON.
 
 Next (v1.1): stages 7–8, exercises 7–10, reading room, Cyrillic → Persian converter, offline service worker.
-Then (v2): Russian track, accounts with D1 and sync (`PUT /api/v1/progress` is reserved), shareable certificate.
+Then (v2): reading Russian signs, Google sign-in, shareable certificate.

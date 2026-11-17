@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import type { ApiError, StageSummary } from '@oina/shared';
 import { allReadings, bundle, CONTENT_VERSION } from './content.js';
 import type { AuthEnv } from './auth/providers.js';
-import { admin, auth } from './auth/routes.js';
+import { admin, auth, progress } from './auth/routes.js';
 
 export interface Env extends AuthEnv {
   ALLOWED_ORIGINS?: string;
@@ -98,10 +98,8 @@ api.get('/dictionary', (c) =>
 );
 
 api.route('/auth', auth);
+api.route('/progress', progress);
 api.route('/admin', admin);
-
-// v2 (progress sync with D1) — reserved so the client contract is clear.
-api.all('/progress', (c) => c.json({ error: 'not implemented yet' }, 501));
 
 app.route('/api/v1', api);
 

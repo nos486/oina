@@ -37,6 +37,7 @@ export function App() {
   return (
     <Routes>
       <Route path="/welcome" element={<WelcomePage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/lesson/:id" element={<LessonRoute />} />
       <Route path="/test/:stageId" element={<StageTestPage />} />
       <Route element={<TabsLayout />}>
@@ -45,7 +46,6 @@ export function App() {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/reading" element={<ReadingPage />} />
         <Route path="/tools" element={<ToolsPage />} />
-        <Route path="/login" element={<LoginPage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
