@@ -9,6 +9,11 @@ compatibility_flags = ["nodejs_compat"]
 # localhost is always allowed for development.
 ALLOWED_ORIGINS = "https://oina.geekio.org,https://oina.pages.dev,https://*.oina.pages.dev"
 
+# Test login (default admin / admin). Before sharing the site, set real secrets:
+#   npx wrangler secret put ADMIN_PASSWORD
+#   npx wrangler secret put AUTH_SECRET      (any long random string)
+# Optional: ADMIN_USERNAME (default "admin"). Later: GOOGLE_CLIENT_ID for Google sign-in.
+
 # Audio from R2 (optional). Create the bucket first:
 #   npx wrangler r2 bucket create oina-audio
 # then uncomment this block and upload files with the same paths as apps/web/public/audio.

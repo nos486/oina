@@ -60,7 +60,7 @@ export function AlphabetPage() {
                 <SoundButton path={audioPath.letterName(open.id)} label="نام حرف" />
               </div>
               <p>💡 {open.mnemonicFa}</p>
-              {open.russianNote && <p className="text-sm text-muted">روسی: {open.russianNote}</p>}
+              {open.russianNote && <p className="text-sm text-muted">در تابلوهای روسی: {open.russianNote}</p>}
               <ul className="flex flex-wrap justify-center gap-2">
                 {open.examples.map((id) => index.wordById.get(id)).filter((w) => !!w).map((w) => (
                   <li key={w.id} className="rounded-xl bg-surface-2 px-3 py-1"><Cyr className="font-bold">{w.cyrillic}</Cyr> = {w.persian}</li>

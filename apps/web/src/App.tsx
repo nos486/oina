@@ -9,6 +9,8 @@ import { ToolsPage } from './pages/ToolsPage';
 import { LessonPage } from './pages/LessonPage';
 import { StageTestPage } from './pages/StageTestPage';
 import { WelcomePage } from './pages/WelcomePage';
+import { LoginPage } from './pages/LoginPage';
+import { AdminPage } from './pages/AdminPage';
 import { useProgress } from './state/progress';
 import { useApplySettings } from './state/settings';
 
@@ -43,6 +45,8 @@ export function App() {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/reading" element={<ReadingPage />} />
         <Route path="/tools" element={<ToolsPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -1,6 +1,7 @@
 # آینه · Оина
 
-Free, no-signup web app that teaches Persian speakers to read Tajik Cyrillic, Duolingo style.
+Free, no-signup web app that teaches Persian speakers to read the Tajik Cyrillic script, Duolingo style.
+It teaches reading the script only, not a new language (a later path covers reading Russian signs, still reading only).
 «فارسی را با خطی دیگر بخوان»
 
 Persian, right-to-left, mobile-first, dark mode. Progress lives in the browser (`localStorage`, key `progress:v1`).
@@ -56,6 +57,25 @@ Tajik audio comes from recorded files only (browsers have no Tajik voice). Until
 
 Later the files can move to R2: uncomment the `[[r2_buckets]]` block in `apps/api/wrangler.toml`,
 upload with the same paths, and set `VITE_AUDIO_BASE` to `https://<worker>/audio/`.
+
+## Sign-in (test login)
+
+Signing in is optional; the app works without an account. For now there is one admin account:
+
+- Default: `admin` / `admin`, which the admin page warns about.
+- Set real values before sharing the site (from `apps/api`):
+  ```bash
+  npx wrangler secret put ADMIN_PASSWORD
+  npx wrangler secret put AUTH_SECRET     # any long random string; signs session tokens
+  npx wrangler secret put ADMIN_USERNAME  # optional, default "admin"
+  ```
+  Changing `AUTH_SECRET` or the password signs everyone out.
+- For `wrangler dev`, copy `apps/api/.dev.vars.example` to `.dev.vars`.
+
+API: `POST /api/v1/auth/login` → `{ token, expiresAt, user }`; send `Authorization: Bearer <token>`;
+`GET /api/v1/auth/me`; `GET /api/v1/admin/stats` (admin only). Tokens are stateless HMAC-signed (30 days),
+so no database is needed yet. Google sign-in will be another provider in `apps/api/src/auth/providers.ts`
+behind the reserved `POST /api/v1/auth/google`, issuing the same token.
 
 ## Deploy (manual)
 

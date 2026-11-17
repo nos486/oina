@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import type { DailyGoal, Settings } from '@oina/shared';
 import { BADGES, buy, STREAK_FREEZE_PRICE } from '@oina/engine';
 import { progressStore, useProgress } from '../state/progress';
+import { auth, isAdmin, useSession } from '../lib/auth';
+import { Link } from 'react-router';
 import { Button, Card, Page } from '../components/ui';
 import { n } from '../lib/format';
 
@@ -16,6 +18,7 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 
 export function ToolsPage() {
   const p = useProgress();
+  const session = useSession();
   const [msg, setMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const set = (patch: Partial<Settings>) => progressStore.update((x) => ({ ...x, settings: { ...x.settings, ...patch } }));
@@ -32,20 +35,31 @@ export function ToolsPage() {
   return (
     <Page title="ابزار و تنظیمات">
       <Card className="mb-4">
+        <h2 className="mb-2 text-lg font-bold">حساب کاربری</h2>
+        {session ? (
+          <div className="flex flex-col gap-2">
+            <p>
+              وارد شده‌ای با نام <b dir="ltr">{session.user.name}</b>
+              {isAdmin(session) && <span className="ms-2 rounded-full bg-cat-tajik px-2 py-0.5 text-xs font-bold text-white">مدیر</span>}
+            </p>
+            {isAdmin(session) && <Link to="/admin" className="font-semibold text-primary">صفحه‌ی مدیریت ←</Link>}
+            <Button variant="secondary" onClick={() => auth.logout()}>خروج از حساب</Button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted">ورود اختیاری است. بعداً با آن می‌توانی پیشرفتت را بین دستگاه‌ها همگام کنی.</p>
+            <Link to="/login" className="min-h-12 rounded-2xl border-2 border-b-4 border-black/15 bg-primary px-5 py-3 text-center font-bold text-primary-ink">ورود</Link>
+          </div>
+        )}
+      </Card>
+
+      <Card className="mb-4">
         <h2 className="mb-1 text-lg font-bold">مبدل سیریلیک ← فارسی</h2>
         <p className="text-muted">به‌زودی (نسخه‌ی ۱٫۱)</p>
       </Card>
 
       <Card className="mb-4">
         <h2 className="mb-2 text-lg font-bold">تنظیمات</h2>
-        <label className="flex min-h-12 items-center justify-between gap-3">
-          <span>مسیر</span>
-          <select className="rounded-xl border-2 border-line bg-surface px-3 py-2" value={p.settings.track} onChange={(e) => set({ track: e.target.value as Settings['track'] })}>
-            <option value="tg">تاجیکی</option>
-            <option value="ru">سفر به روسیه (به‌زودی)</option>
-            <option value="both">هر دو</option>
-          </select>
-        </label>
         <label className="flex min-h-12 items-center justify-between gap-3">
           <span>هدف روزانه</span>
           <select className="rounded-xl border-2 border-line bg-surface px-3 py-2" value={p.dailyGoal} onChange={(e) => progressStore.update((x) => ({ ...x, dailyGoal: Number(e.target.value) as DailyGoal }))}>

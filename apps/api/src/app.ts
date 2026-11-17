@@ -2,8 +2,10 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ApiError, StageSummary } from '@oina/shared';
 import { allReadings, bundle, CONTENT_VERSION } from './content.js';
+import type { AuthEnv } from './auth/providers.js';
+import { admin, auth } from './auth/routes.js';
 
-export interface Env {
+export interface Env extends AuthEnv {
   ALLOWED_ORIGINS?: string;
   AUDIO?: R2Bucket;
 }
@@ -30,6 +32,7 @@ app.use('/api/*', async (c, next) => {
   return cors({
     origin: (origin) => (origin && originAllowed(origin, allowed) ? origin : null),
     allowMethods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'POST'],
+    allowHeaders: ['Content-Type', 'Authorization'],
     maxAge: DAY,
   })(c, next);
 });
@@ -94,8 +97,10 @@ api.get('/dictionary', (c) =>
   cached(c, Object.fromEntries(bundle.words.map((w) => [w.cyrillic.toLowerCase(), w.persian])), 7 * DAY),
 );
 
-// v2 (accounts and sync) — reserved so the client contract is clear.
-api.all('/auth/*', (c) => c.json({ error: 'not implemented yet' }, 501));
+api.route('/auth', auth);
+api.route('/admin', admin);
+
+// v2 (progress sync with D1) — reserved so the client contract is clear.
 api.all('/progress', (c) => c.json({ error: 'not implemented yet' }, 501));
 
 app.route('/api/v1', api);
