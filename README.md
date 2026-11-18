@@ -48,12 +48,22 @@ Words marked `"needsReview": true` need a Tajik speaker to confirm the spelling 
 
 ## Audio
 
-Tajik audio comes from recorded files only (browsers have no Tajik voice). Until a file exists, its sound button is greyed out.
+Tajik audio comes from files (browsers have no Tajik voice); Russian uses the browser voice (Web Speech, ru-RU).
+A sound button is greyed out until its file is listed in `content/audio-manifest.json`.
 
-1. Put files in `apps/web/public/audio/` using the names in `public/audio/README.md`
-   (e.g. `tg/words/kafsh.mp3`, `tg/letters/sha-sound.mp3`).
+All 245 Tajik files (35 letter names, 35 letter sounds, 175 words) are placeholders generated with
+Meta's MMS model `facebook/mms-tts-tgk` (CC-BY-NC-4.0, allowed because Oina is free). Replace any
+of them with a real recording at the same path.
+
+1. Generate missing files (or `--force` to redo all). Needs Python 3.10+ and ffmpeg:
+   ```sh
+   python -m venv .venv && . .venv/bin/activate && pip install torch transformers numpy
+   python scripts/tts/generate_tg_audio.py
+   ```
+   Or put recordings in `apps/web/public/audio/` using the names in `public/audio/README.md`
+   (e.g. `tg/words/kafsh.mp3`, `tg/letters/sha-sound.mp3`). Format: mp3, mono, 64 kbps, no silence at the ends.
 2. Run `pnpm audio:list`. It updates `content/audio-manifest.json` and writes `audio-missing.txt`.
-3. Commit and redeploy both the API and the web app.
+3. Commit and redeploy both the API (it serves the manifest) and the web app (it serves the files at `/audio/`).
 
 Later the files can move to R2: uncomment the `[[r2_buckets]]` block in `apps/api/wrangler.toml`,
 upload with the same paths, and set `VITE_AUDIO_BASE` to `https://<worker>/audio/`.

@@ -8,3 +8,5 @@ test-results/
 playwright-report/
 coverage/
 audio-missing.txt
+.venv/
+__pycache__/
