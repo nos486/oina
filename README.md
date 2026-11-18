@@ -81,17 +81,15 @@ unioned, XP and stars take the max, each item keeps its most recent state).
 - The session signing key is generated on first use and stored in D1 (`config` table); no secrets to set.
   (Optional override: `npx wrangler secret put AUTH_SECRET`.)
 
-### One-time D1 setup (from `apps/api`)
+### Database migrations: automatic
 
-```bash
-npx wrangler d1 create oina
-# copy the printed database_id into apps/api/wrangler.toml ([[d1_databases]] → database_id)
-npx wrangler d1 migrations apply oina --remote
-npx wrangler deploy
-```
+The Worker migrates its own D1 database. Migrations live in `apps/api/src/db/migrations.ts`; on the
+first request after a deploy, each Worker instance applies any that are pending (tracked in the
+`_oina_migrations` table) and remembers it. So a plain `wrangler deploy` is all that is needed, including
+the very first deploy on an empty database. To change the schema, append a migration with the next id,
+keep its statements safe to run twice (`IF NOT EXISTS`, `INSERT OR IGNORE`), and deploy.
 
-New migrations go in `apps/api/migrations/` and are applied the same way. For `wrangler dev`, run
-`npx wrangler d1 migrations apply oina --local` once.
+The D1 binding is `DB` in `apps/api/wrangler.toml` (database `oina`).
 
 API: `POST /api/v1/auth/login` and `/auth/register` → `{ token, expiresAt, user }`; send `Authorization: Bearer <token>`.
 `GET /auth/me`, `POST /auth/password`, `GET|PUT /progress`, `GET /admin/stats` (admin only).

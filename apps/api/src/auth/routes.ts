@@ -6,6 +6,7 @@ import { MIN_PASSWORD_LENGTH, USERNAME_RE } from '@oina/shared';
 import { mergeProgress, normalizeProgress } from '@oina/engine';
 import { bundle, CONTENT_VERSION } from '../content.js';
 import { Repo, toAuthUser, type UserRow } from '../db/repo.js';
+import { ensureMigrated } from '../db/migrate.js';
 import { type AuthEnv, passwordLogin } from './providers.js';
 import { hashPassword, verifyPassword } from './password.js';
 import { signToken, verifyToken } from './token.js';
@@ -23,6 +24,7 @@ const noStore = { 'Cache-Control': 'no-store' };
 /** Every auth/progress route needs D1. Without the binding the content API still works. */
 const withDb: MiddlewareHandler<Env> = async (c, next) => {
   if (!c.env?.DB) return c.json({ error: 'database not configured (D1 binding "DB" is missing)' }, 503);
+  await ensureMigrated(c.env.DB);
   c.set('repo', new Repo(c.env.DB));
   await next();
 };
@@ -137,13 +139,8 @@ progress.put('/', async (c) => {
 // ---------- /admin ----------
 
 export const admin = new Hono<Env>();
-admin.use('*', async (c, next) => {
-  if (c.env?.DB) c.set('repo', new Repo(c.env.DB));
-  // Without D1 nobody can sign in, so admin routes are closed.
-  else return c.json({ error: 'database not configured (D1 binding "DB" is missing)' }, 503);
-  await next();
-});
-admin.use('*', requireRole('admin'));
+// Without D1 nobody can sign in, so admin routes are closed.
+admin.use('*', withDb, requireRole('admin'));
 
 admin.get('/stats', async (c) => {
   const repo = c.get('repo');

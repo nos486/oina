@@ -16,13 +16,10 @@ ALLOWED_ORIGINS = "https://oina.geekio.org,https://oina.pages.dev,https://*.oina
 # binding = "AUDIO"
 # bucket_name = "oina-audio"
 
-# Accounts and saved progress (D1). One-time setup, from apps/api:
-#   1. npx wrangler d1 create oina            → copy the database_id it prints into the line below
-#   2. npx wrangler d1 migrations apply oina --remote
-#   3. npx wrangler deploy
+# Accounts and saved progress (D1). The Worker applies its own migrations (src/db/migrations.ts)
+# on the first request after each deploy, so there is nothing to run by hand.
 # The first migration creates the default admin (username admin, password admin).
 [[d1_databases]]
 binding = "DB"
 database_name = "oina"
-database_id = "PUT-YOUR-DATABASE-ID-HERE"
-migrations_dir = "migrations"
+database_id = "7fa0f388-8f51-49c6-9c37-ca6f9ade87f2"
