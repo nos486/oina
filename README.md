@@ -61,7 +61,7 @@ of them with a real recording at the same path.
    python scripts/tts/generate_tg_audio.py
    ```
    Or put recordings in `apps/web/public/audio/` using the names in `public/audio/README.md`
-   (e.g. `tg/words/kafsh.mp3`, `tg/letters/sha-sound.mp3`). Format: mp3, mono, 64 kbps, no silence at the ends.
+   (e.g. `tg/words/kafsh.mp3`, `tg/letters/sha-sound.mp3`). Format: mp3, mono, 64 kbps, about 0.15 s of silence before and 0.2 s after.
 2. Run `pnpm audio:list`. It updates `content/audio-manifest.json` and writes `audio-missing.txt`.
 3. Commit and redeploy both the API (it serves the manifest) and the web app (it serves the files at `/audio/`).
 

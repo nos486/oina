@@ -7,7 +7,8 @@ const CACHE_KEY = 'content-cache:v1';
 export class ApiError extends Error {}
 
 async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, { headers: { Accept: 'application/json' } });
+  // no-cache: always revalidate (ETag, usually a 304) so a redeploy is picked up right away.
+  const res = await fetch(`${API_BASE}${path}`, { headers: { Accept: 'application/json' }, cache: 'no-cache' });
   if (!res.ok) throw new ApiError(`${path}: HTTP ${res.status}`);
   return (await res.json()) as T;
 }

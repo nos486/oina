@@ -37,10 +37,13 @@ app.use('/api/*', async (c, next) => {
   })(c, next);
 });
 
-/** JSON with cache headers and ETag (content only changes on deploy). */
-function cached(c: { req: { header: (n: string) => string | undefined }; body: (b: null, s: 304, h: Record<string, string>) => Response; json: (d: unknown, s?: 200, h?: Record<string, string>) => Response }, data: unknown, maxAge = DAY) {
+/**
+ * JSON with an ETag. Browsers must revalidate every time (a cheap 304), so a deploy that changes
+ * content, such as new audio in the manifest, reaches everyone on their next visit.
+ */
+function cached(c: { req: { header: (n: string) => string | undefined }; body: (b: null, s: 304, h: Record<string, string>) => Response; json: (d: unknown, s?: 200, h?: Record<string, string>) => Response }, data: unknown) {
   const etag = `W/"${CONTENT_VERSION}"`;
-  const headers = { 'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge}`, ETag: etag };
+  const headers = { 'Cache-Control': 'public, no-cache', ETag: etag };
   if (c.req.header('If-None-Match') === etag) return c.body(null, 304, headers);
   return c.json(data, 200, headers);
 }
@@ -94,7 +97,7 @@ api.get('/readings/:id', (c) => {
 
 /** Small dictionary for the script converter (v1.1): Cyrillic → correct Persian spelling. */
 api.get('/dictionary', (c) =>
-  cached(c, Object.fromEntries(bundle.words.map((w) => [w.cyrillic.toLowerCase(), w.persian])), 7 * DAY),
+  cached(c, Object.fromEntries(bundle.words.map((w) => [w.cyrillic.toLowerCase(), w.persian]))),
 );
 
 api.route('/auth', auth);

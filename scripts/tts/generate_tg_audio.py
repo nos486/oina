@@ -9,7 +9,7 @@ fine for Oina because the app is free and non-commercial).
     pnpm audio:list                                    # refresh content/audio-manifest.json
 
 Needs ffmpeg on PATH. Output: apps/web/public/audio/tg/..., mp3, mono, 64 kbps,
-silence trimmed at both ends. Replace any file with a real recording at the same path.
+model silence trimmed, then a short fixed pad (0.15 s / 0.2 s). Replace any file with a real recording at the same path.
 """
 import argparse, json, subprocess, sys
 from pathlib import Path
@@ -61,7 +61,10 @@ def to_mp3(wave: np.ndarray, sr: int, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     pcm = (np.clip(wave, -1, 1) * 32767).astype("<i2").tobytes()
     trim = "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.03"
-    af = f"{trim},areverse,{trim},areverse,loudnorm=I=-16:TP=-1.5:LRA=11"
+    # Trim the model's silence, then add a short fixed pad (0.15 s before, 0.2 s after): phones and
+    # Bluetooth headsets often swallow the first moments of a sound, and some clips are only 0.2 s long.
+    pad = "adelay=150:all=1,apad=pad_dur=0.2"
+    af = f"{trim},areverse,{trim},areverse,loudnorm=I=-16:TP=-1.5:LRA=11,{pad}"
     subprocess.run(
         ["ffmpeg", "-loglevel", "error", "-y", "-f", "s16le", "-ar", str(sr), "-ac", "1", "-i", "-",
          "-af", af, "-ar", "22050", "-ac", "1", "-c:a", "libmp3lame", "-b:a", "64k", str(dest)],

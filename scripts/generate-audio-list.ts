@@ -29,4 +29,4 @@ fs.writeFileSync(path.join(CONTENT_DIR, 'audio-manifest.json'), JSON.stringify(p
 fs.writeFileSync(path.join(ROOT, 'audio-missing.txt'), missing.map((m) => `${m.file}\t${m.what}`).join('\n') + '\n');
 console.log(`Audio dir: ${path.relative(ROOT, audioDir) || '.'}`);
 console.log(`${present.length} present, ${missing.length} missing (see audio-missing.txt)`);
-console.log('Format: mp3, mono, 64 kbps, no leading/trailing silence.');
+console.log('Format: mp3, mono, 64 kbps, ~0.15 s silence before, ~0.2 s after.');

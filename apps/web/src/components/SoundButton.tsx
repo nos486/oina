@@ -6,13 +6,15 @@ import { playAudio } from '../lib/audio';
 export function SoundButton({ path, slow = false, size = 'md', label = 'پخش صدا' }: { path?: string; slow?: boolean; size?: 'md' | 'lg'; label?: string }) {
   const { audio } = useContent();
   const { settings } = useProgress();
-  const available = !!path && audio.has(path) && settings.sound;
+  const hasFile = !!path && audio.has(path);
+  const available = hasFile && settings.sound;
+  const why = !hasFile ? 'صدا هنوز ضبط نشده' : 'صدا در تنظیمات خاموش است';
   const dim = size === 'lg' ? 'h-16 w-16 text-2xl' : 'h-11 w-11 text-lg';
   return (
     <button
       type="button"
-      aria-label={available ? label : `${label} (صدا هنوز ضبط نشده)`}
-      title={available ? label : 'صدا هنوز ضبط نشده'}
+      aria-label={available ? label : `${label} (${why})`}
+      title={available ? label : why}
       disabled={!available}
       onClick={() => path && playAudio(path, slow)}
       className={`${dim} grid shrink-0 place-items-center rounded-2xl border-2 border-b-4 border-primary bg-primary-soft text-primary transition active:translate-y-0.5 disabled:border-line disabled:bg-surface-2 disabled:text-muted disabled:opacity-60`}
