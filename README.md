@@ -66,6 +66,11 @@ they wait for a real recording. An earlier attempt with `facebook/mms-tts-tgk` w
    Or put recordings in `apps/web/public/audio/` using the names in `public/audio/README.md`
    (e.g. `tg/words/kafsh.mp3`, `tg/letters/sha-sound.mp3`). Format: mp3, mono, 64 kbps, about 0.15 s of silence before and 0.2 s after.
 2. Run `pnpm audio:list`. It updates `content/audio-manifest.json` and writes `audio-missing.txt`.
+Human recordings: 67 of our words exist on [Lingua Libre](https://lingualibre.org) (CC0), listed in
+`content/audio-sources/lingualibre-tg.json`. Run the **Fetch Lingua Libre audio** GitHub Action (or
+`python3 scripts/audio/fetch_lingualibre.py && pnpm audio:list` locally) to download them; they replace the
+machine clips for those words. Credits: `apps/web/public/audio/CREDITS.md`.
+
 3. Commit and redeploy both the API (it serves the manifest) and the web app (it serves the files at `/audio/`).
 
 Later the files can move to R2: uncomment the `[[r2_buckets]]` block in `apps/api/wrangler.toml`,
