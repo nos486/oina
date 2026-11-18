@@ -66,3 +66,24 @@ test('alphabet hall shows all 35 letters', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'تالار الفبا' })).toBeVisible();
   await expect(page.locator('main button[aria-label]')).toHaveCount(35);
 });
+
+test('a lesson left halfway resumes from the same question', async ({ page }) => {
+  await mockApi(page);
+  await seedProgress(page, { onboarded: true });
+  await page.goto('/lesson/s1-l1');
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'بعدی' }).click();
+  for (let i = 0; i < 2; i++) {
+    await page.getByRole('radio').first().click();
+    await page.getByRole('button', { name: 'بررسی' }).click();
+    await page.getByRole('button', { name: 'ادامه' }).click();
+  }
+  const before = await page.getByRole('progressbar').getAttribute('aria-valuenow');
+  await page.getByRole('button', { name: 'خروج از درس' }).click();
+
+  // The path offers to continue; the lesson opens on the same question without the intro cards.
+  await expect(page.getByText('درس نیمه‌کاره')).toBeVisible();
+  await page.getByRole('link', { name: 'ادامه بده' }).click();
+  await expect(page.getByRole('button', { name: 'بررسی' })).toBeVisible();
+  await expect(page.getByText(/حرف تازه/)).toHaveCount(0);
+  expect(await page.getByRole('progressbar').getAttribute('aria-valuenow')).toBe(before);
+});

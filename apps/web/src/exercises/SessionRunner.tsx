@@ -19,13 +19,17 @@ interface Props {
   level: 1 | 2 | 3;
   ctx: Ctx;
   onComplete: (s: SessionState) => void;
+  /** Resume a saved session instead of starting fresh. */
+  initialState?: SessionState;
+  /** Called after every answer with the new state (used to save the lesson for later). */
+  onProgress?: (s: SessionState) => void;
 }
 
 /** Runs any session (lesson, review, mistakes, stage test): question → check → feedback → next. */
-export function SessionRunner({ mode, questions, level, ctx, onComplete }: Props) {
+export function SessionRunner({ mode, questions, level, ctx, onComplete, initialState, onProgress }: Props) {
   const navigate = useNavigate();
   const progress = useProgress();
-  const [state, setState] = useState(() => startSession(mode, questions, level));
+  const [state, setState] = useState(() => initialState ?? startSession(mode, questions, level));
   const [response, setResponse] = useState<Response | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ grade: Grade; combo: boolean; q: Question } | null>(null);
@@ -56,9 +60,10 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete }: Props
       else fxWrong(progress.settings.sound);
       if (q.feedbackAudio && progress.settings.sound) void playAudio(q.feedbackAudio);
       setState(out.state);
+      onProgress?.(out.state);
       setFeedback({ grade: out.grade, combo: out.comboActive, q });
     },
-    [q, feedback, state, ctx, mode, progress.settings.sound],
+    [q, feedback, state, ctx, mode, progress.settings.sound, onProgress],
   );
 
   const next = useCallback(() => {

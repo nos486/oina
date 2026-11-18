@@ -8,6 +8,7 @@ import {
 import { audioPath } from '@oina/shared';
 import { useContent } from '../state/content';
 import { progressStore } from '../state/progress';
+import { savedSession } from '../state/savedSession';
 import { SessionRunner } from '../exercises/SessionRunner';
 import { LetterIntro } from '../components/LetterIntro';
 import { Button, Card, Page } from '../components/ui';
@@ -25,9 +26,11 @@ export function LessonPage() {
   const navigate = useNavigate();
   const lesson = index.lessonById.get(id);
   const level = nextLevel(progressStore.get(), id);
+  // A lesson left halfway resumes from the same question (read once, on mount).
+  const [resume] = useState(() => savedSession.forLesson(id, level)?.state);
   // Intro cards only on the first play of a lesson.
   const [phase, setPhase] = useState<Phase>(() =>
-    lesson && lesson.newLetters.length && level === 1 ? { kind: 'intro', i: 0 } : { kind: 'session' },
+    lesson && lesson.newLetters.length && level === 1 && !resume ? { kind: 'intro', i: 0 } : { kind: 'session' },
   );
   const setup = useMemo(() => {
     if (!lesson) return null;
@@ -68,7 +71,10 @@ export function LessonPage() {
         questions={setup.questions}
         level={level}
         ctx={setup.ctx}
+        initialState={resume}
+        onProgress={(s) => savedSession.save(lesson.id, level, s)}
         onComplete={(s) => {
+          savedSession.clear();
           const now = new Date();
           let earned: string[] = [];
           const levelBefore = levelForXp(progressStore.get().xp);
