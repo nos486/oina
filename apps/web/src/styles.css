@@ -31,6 +31,13 @@
   --cat-tajik: #7048e8;
   --cat-other: #868e96;
   --gold: #f2b01e;
+  /* One accent per stage on the path (white text on top). */
+  --stage-1: #0f9b97;
+  --stage-2: #e8590c;
+  --stage-3: #1c7ed6;
+  --stage-4: #7048e8;
+  --stage-5: #2f9e44;
+  --stage-6: #d6336c;
   color-scheme: light;
 }
 .dark {
@@ -53,6 +60,12 @@
   --cat-tajik: #9775fa;
   --cat-other: #adb5bd;
   --gold: #ffd43b;
+  --stage-1: #12807c;
+  --stage-2: #c2410c;
+  --stage-3: #1864ab;
+  --stage-4: #5f3dc4;
+  --stage-5: #2b8a3e;
+  --stage-6: #a61e4d;
   color-scheme: dark;
 }
 
