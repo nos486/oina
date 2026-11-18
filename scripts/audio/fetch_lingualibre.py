@@ -8,7 +8,7 @@ into apps/web/public/audio. They replace any machine-made clip at the same path.
 Needs Python 3.9+ and ffmpeg. Wikimedia rate-limits busy shared IPs; run it from a normal
 connection or the "Fetch Lingua Libre audio" GitHub Action.
 """
-import json, subprocess, sys, time, urllib.error, urllib.request
+import json, os, subprocess, sys, time, urllib.error, urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,7 +39,7 @@ def main() -> int:
             wav = get(s["url"])
             dest = OUT / s["file"]
             dest.parent.mkdir(parents=True, exist_ok=True)
-            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", "-", "-af", AF, "-ac", "1", "-ar", "24000",
+            subprocess.run([os.environ.get("FFMPEG", "ffmpeg"), "-loglevel", "error", "-y", "-i", "-", "-af", AF, "-ac", "1", "-ar", "24000",
                             "-c:a", "libmp3lame", "-b:a", "64k", str(dest)], input=wav, check=True)
             print(f"[{n}/{len(sources)}] {s['word']} -> {s['file']}", flush=True)
         except Exception as e:  # keep going; report at the end
