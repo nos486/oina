@@ -5,8 +5,10 @@ import './styles.css';
 import { App } from './App';
 import { ContentProvider } from './state/content';
 import { startSync } from './lib/sync';
+import { startPwa } from './lib/pwa';
 
 startSync();
+startPwa();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

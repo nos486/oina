@@ -25,6 +25,8 @@ interface Props {
   onProgress?: (s: SessionState) => void;
 }
 
+const PRAISE = ['درست است!', 'آفرین!', 'عالی!', 'دقیقاً!', 'ایول!', 'همین است!'];
+
 /** Runs any session (lesson, review, mistakes, stage test): question → check → feedback → next. */
 export function SessionRunner({ mode, questions, level, ctx, onComplete, initialState, onProgress }: Props) {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete, initial
   const [state, setState] = useState(() => initialState ?? startSession(mode, questions, level));
   const [response, setResponse] = useState<Response | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ grade: Grade; combo: boolean; q: Question } | null>(null);
+  const [feedback, setFeedback] = useState<{ grade: Grade; combo: boolean; q: Question; xp: number; praise: string } | null>(null);
   const shownAt = useRef(Date.now());
   // While feedback shows, keep the answered question on screen (the session may already be done).
   const q = feedback ? feedback.q : currentQuestion(state);
@@ -61,7 +63,7 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete, initial
       if (q.feedbackAudio && progress.settings.sound) void playAudio(q.feedbackAudio);
       setState(out.state);
       onProgress?.(out.state);
-      setFeedback({ grade: out.grade, combo: out.comboActive, q });
+      setFeedback({ grade: out.grade, combo: out.comboActive, q, xp: out.xp, praise: PRAISE[Math.floor(Math.random() * PRAISE.length)]! });
     },
     [q, feedback, state, ctx, mode, progress.settings.sound, onProgress],
   );
@@ -112,12 +114,19 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete, initial
     <div className="mx-auto flex min-h-dvh max-w-[720px] flex-col px-4 pt-3">
       <div className="mb-6 flex items-center gap-3">
         <button type="button" aria-label="خروج از درس" onClick={() => navigate('/')} className="text-2xl text-muted">✕</button>
-        <ProgressBar value={sessionProgress(state)} />
+        <div className="relative flex-1">
+          <ProgressBar value={sessionProgress(state)} />
+          {feedback?.grade.correct && feedback.xp > 0 && (
+            <span key={state.answered} aria-hidden dir="ltr" className="animate-float-up pointer-events-none absolute top-0 left-1/2 text-sm font-extrabold text-gold">
+              +{n(feedback.xp)}
+            </span>
+          )}
+        </div>
         {mode === 'lesson' && progress.settings.hearts && <span className="font-bold whitespace-nowrap text-bad" aria-label="جان">♥ {n(progress.hearts.count)}</span>}
-        {state.combo >= 5 && <span className="font-bold whitespace-nowrap text-cat-trap" aria-label="کمبو">🔥×۲</span>}
+        {state.combo >= 5 && <span key={state.combo === 5 ? 'c5' : 'c'} className="animate-pop font-bold whitespace-nowrap text-cat-trap" aria-label="کمبو">🔥×۲</span>}
       </div>
 
-      <div className="flex-1" key={q.id}>
+      <div className="animate-rise flex-1" key={q.id}>
         {q.type === 'match' ? (
           <MatchExercise q={q} onDone={(r) => submit(r)} />
         ) : q.type === 'buildWord' ? (
@@ -130,8 +139,11 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete, initial
       <div className="sticky bottom-0 -mx-4 mt-6">
         {feedback ? (
           <div role="status" aria-live="polite" className={`animate-slide-up px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] ${feedback.grade.correct ? 'bg-good-soft' : 'bg-bad-soft'}`}>
-            <p className={`mb-1 text-xl font-extrabold ${feedback.grade.correct ? 'text-good' : 'text-bad'}`}>
-              {feedback.grade.correct ? (feedback.combo ? 'عالی! کمبو 🔥' : 'درست است!') : 'جواب درست:'}
+            <p className={`mb-1 flex items-center gap-2 text-xl font-extrabold ${feedback.grade.correct ? 'text-good' : 'text-bad'}`}>
+              <span aria-hidden className={`animate-bounce-in grid h-8 w-8 place-items-center rounded-full text-base text-white ${feedback.grade.correct ? 'bg-good' : 'bg-bad'}`}>
+                {feedback.grade.correct ? '✓' : '✕'}
+              </span>
+              {feedback.grade.correct ? (feedback.combo ? 'عالی! کمبو 🔥' : feedback.praise) : 'جواب درست:'}
             </p>
             {!feedback.grade.correct && (
               <p className="mb-1 text-lg font-bold">

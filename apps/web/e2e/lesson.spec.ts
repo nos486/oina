@@ -87,3 +87,18 @@ test('a lesson left halfway resumes from the same question', async ({ page }) =>
   await expect(page.getByText(/حرف تازه/)).toHaveCount(0);
   expect(await page.getByRole('progressbar').getAttribute('aria-valuenow')).toBe(before);
 });
+
+test('profile shows level, practice calendar, letter mastery and badges', async ({ page }) => {
+  await mockApi(page);
+  await seedProgress(page, { onboarded: true, xp: 260, badges: ['first-word'], completedLessons: ['s1-l1'] });
+  await page.goto('/');
+  await page.getByRole('link', { name: 'من', exact: true }).click();
+  await expect(page).toHaveURL(/\/profile$/);
+  await expect(page.getByRole('heading', { name: 'روزهای تمرین' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'تسلط بر حروف' })).toBeVisible();
+  await expect(page.getByText('اولین کلمه')).toBeVisible();
+  await page.getByRole('link', { name: /تنظیمات/ }).click();
+  await expect(page).toHaveURL(/\/tools$/);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});

@@ -22,19 +22,25 @@ function tone(freqs: number[], duration = 0.12) {
   }
 }
 
-export function fxCorrect(sound: boolean) {
-  if (sound) tone([660, 880]);
-}
-
-export function fxWrong(sound: boolean) {
-  if (sound) tone([220, 180], 0.15);
+function vibrate(pattern: number | number[]) {
   try {
-    navigator.vibrate?.(80);
+    navigator.vibrate?.(pattern);
   } catch {
     /* not supported */
   }
 }
 
+export function fxCorrect(sound: boolean) {
+  if (sound) tone([660, 880]);
+  vibrate(15);
+}
+
+export function fxWrong(sound: boolean) {
+  if (sound) tone([220, 180], 0.15);
+  vibrate(80);
+}
+
 export function fxFinish(sound: boolean) {
   if (sound) tone([523, 659, 784, 1046], 0.1);
+  vibrate([30, 60, 30]);
 }

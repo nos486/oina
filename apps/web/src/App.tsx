@@ -6,6 +6,7 @@ import { AlphabetPage } from './pages/AlphabetPage';
 import { ReviewPage } from './pages/ReviewPage';
 import { ReadingPage } from './pages/ReadingPage';
 import { ToolsPage } from './pages/ToolsPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { LessonPage } from './pages/LessonPage';
 import { StageTestPage } from './pages/StageTestPage';
 import { WelcomePage } from './pages/WelcomePage';
@@ -45,6 +46,7 @@ export function App() {
         <Route path="/alphabet" element={<AlphabetPage />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/reading" element={<ReadingPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/tools" element={<ToolsPage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Route>

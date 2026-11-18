@@ -63,7 +63,7 @@ export function ChoiceExercise({
               onClick={() => onChange({ type: 'choice', optionId: o.id }, o.id)}
               className={`relative min-h-16 rounded-2xl border-2 border-b-4 px-3 py-3 text-center transition active:translate-y-0.5 ${
                 locked && o.id === q.correctId
-                  ? 'border-good bg-good-soft'
+                  ? `border-good bg-good-soft ${isSel ? 'animate-bounce-in' : ''}`
                   : locked && isSel
                     ? 'animate-shake border-bad bg-bad-soft'
                     : isSel

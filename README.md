@@ -6,6 +6,8 @@ It teaches reading the script only, not a new language (a later path covers read
 
 Persian, right-to-left, mobile-first, dark mode. Progress lives in the browser (`localStorage`, key `progress:v1`).
 A lesson left halfway is kept on the device (`session:v1`, up to 3 days) and resumes from the same question.
+The app is a PWA: `public/sw.js` (registered in production builds) caches the app shell, build files and played
+audio so it opens offline and can be added to the home screen. Bump `VERSION` in `sw.js` to drop old caches.
 An Android app can be built later from the same web app.
 
 ## Layout

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { SessionState } from '@oina/engine';
 import {
-  accuracy, addXp, awardBadges, BADGES, completeLesson, levelForXp, contextFor, createRng, generateLessonQuestions,
+  accuracy, addXp, awardBadges, BADGES, completeLesson, currentStreak, levelForXp, xpToday, contextFor, createRng, generateLessonQuestions,
   letterKey, nextLevel, weakestItems,
 } from '@oina/engine';
 import { audioPath } from '@oina/shared';
@@ -15,10 +15,11 @@ import { Button, Card, Page } from '../components/ui';
 import { Cyr } from '../components/Cyr';
 import { Hoopoe } from '../components/Hoopoe';
 import { Confetti } from '../components/Confetti';
+import { CountUp, GoalReached, LevelUp, StarRow } from '../components/Rewards';
 import { fxFinish } from '../lib/fx';
 import { n, pct } from '../lib/format';
 
-type Phase = { kind: 'intro'; i: number } | { kind: 'session' } | { kind: 'result'; s: SessionState; badges: string[]; levelUp: number | null };
+type Phase = { kind: 'intro'; i: number } | { kind: 'session' } | { kind: 'result'; s: SessionState; badges: string[]; levelUp: number | null; goalReached: boolean };
 
 export function LessonPage() {
   const { id = '' } = useParams();
@@ -78,6 +79,8 @@ export function LessonPage() {
           const now = new Date();
           let earned: string[] = [];
           const levelBefore = levelForXp(progressStore.get().xp);
+          const before = progressStore.get();
+          const goalBefore = xpToday(before, now) >= before.dailyGoal;
           progressStore.update((p) => {
             let next = completeLesson(p, lesson.id, level);
             next = addXp(next, s.xp, now);
@@ -87,13 +90,15 @@ export function LessonPage() {
           });
           fxFinish(progressStore.get().settings.sound);
           const levelAfter = levelForXp(progressStore.get().xp);
-          setPhase({ kind: 'result', s, badges: earned, levelUp: levelAfter > levelBefore ? levelAfter : null });
+          const after = progressStore.get();
+          const goalReached = !goalBefore && xpToday(after, now) >= after.dailyGoal;
+          setPhase({ kind: 'result', s, badges: earned, levelUp: levelAfter > levelBefore ? levelAfter : null, goalReached });
         }}
       />
     );
   }
 
-  const { s, badges, levelUp } = phase;
+  const { s, badges, levelUp, goalReached } = phase;
   const now = new Date();
   const p = progressStore.get();
   const weak = weakestItems(p, [...new Set([...s.missed.filter((k) => k.startsWith('letter:')), ...lesson.newLetters.map(letterKey)])], now, 3, 50)
@@ -107,23 +112,22 @@ export function LessonPage() {
     <Page>
       <Confetti />
       <div className="flex flex-col items-center gap-2 text-center">
-        <Hoopoe size={88} mood="cheer" />
-        <h1 className="text-2xl font-extrabold">درس تمام شد!</h1>
-        <p className="text-muted">سطح {n(level)} از ۳ {'⭐'.repeat(level)}</p>
+        <span className="animate-bob"><Hoopoe size={88} mood="cheer" /></span>
+        <h1 className="animate-rise text-2xl font-extrabold">{s.wrongCount === 0 ? 'بی‌نقص! درس تمام شد' : 'درس تمام شد!'}</h1>
+        <StarRow value={level} />
+        <p className="text-sm text-muted">سطح {n(level)} از ۳ این درس</p>
       </div>
       <div className="my-5 grid grid-cols-3 gap-3 text-center">
-        <Card><div className="text-2xl font-extrabold text-gold">{n(s.xp)}</div><div className="text-sm text-muted">امتیاز</div></Card>
-        <Card><div className="text-2xl font-extrabold text-good">{pct(accuracy(s))}</div><div className="text-sm text-muted">دقت</div></Card>
-        <Card><div className="text-2xl font-extrabold text-cat-trap">{n(s.bestCombo)}</div><div className="text-sm text-muted">بیشترین کمبو</div></Card>
+        <Card className="animate-rise [animation-delay:0.1s]"><div className="text-2xl font-extrabold text-gold" dir="ltr">+<CountUp value={s.xp} /></div><div className="text-sm text-muted">امتیاز</div></Card>
+        <Card className="animate-rise [animation-delay:0.2s]"><div className="text-2xl font-extrabold text-good">{pct(accuracy(s))}</div><div className="text-sm text-muted">دقت</div></Card>
+        <Card className="animate-rise [animation-delay:0.3s]"><div className="text-2xl font-extrabold text-cat-trap">{n(s.bestCombo)}</div><div className="text-sm text-muted">بیشترین کمبو</div></Card>
       </div>
-      {levelUp && (
-        <Card className="mb-4 text-center">
-          <p className="text-lg font-extrabold text-primary">رسیدی به سطح {n(levelUp)}! 🎉</p>
-        </Card>
-      )}
+      {goalReached && <GoalReached streak={currentStreak(p, now)} />}
+      {levelUp && <LevelUp level={levelUp} />}
       {badges.length > 0 && (
-        <Card className="mb-4 text-center">
-          <p className="font-bold">نشان تازه: {badges.map((b) => BADGES.find((x) => x.id === b)?.titleFa).join('، ')} 🏅</p>
+        <Card className="animate-pop mb-4 border-gold text-center">
+          <p className="text-3xl" aria-hidden>🏅</p>
+          <p className="font-bold">نشان تازه: {badges.map((b) => BADGES.find((x) => x.id === b)?.titleFa).join('، ')}</p>
         </Card>
       )}
       {weak.length > 0 && (

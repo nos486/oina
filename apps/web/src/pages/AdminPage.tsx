@@ -34,7 +34,7 @@ export function AdminPage() {
         <Card className="mb-4 border-bad bg-bad-soft">
           <p className="font-bold text-bad">رمز پیش‌فرض (admin) هنوز فعال است.</p>
           <p className="text-sm">
-            قبل از اشتراک‌گذاری سایت رمز را عوض کن: <Link to="/tools" className="font-semibold text-primary">ابزار ← حساب کاربری ← تغییر رمز</Link>
+            قبل از اشتراک‌گذاری سایت رمز را عوض کن: <Link to="/tools" className="font-semibold text-primary">من ← تنظیمات ← حساب کاربری ← تغییر رمز</Link>
           </p>
         </Card>
       )}

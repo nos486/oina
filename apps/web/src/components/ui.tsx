@@ -23,7 +23,7 @@ export function Button({ variant = 'primary', className = '', children, ...rest 
 
 export function Page({ children, title }: { children: ReactNode; title?: string }) {
   return (
-    <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24 md:pb-8">
+    <main className="animate-rise mx-auto w-full max-w-[720px] px-4 pt-4 pb-24 md:pb-8">
       {title && <h1 className="mb-4 text-2xl font-extrabold">{title}</h1>}
       {children}
     </main>

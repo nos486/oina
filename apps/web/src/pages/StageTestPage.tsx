@@ -7,6 +7,7 @@ import { progressStore } from '../state/progress';
 import { SessionRunner } from '../exercises/SessionRunner';
 import { Button, Page } from '../components/ui';
 import { Hoopoe } from '../components/Hoopoe';
+import { StarRow } from '../components/Rewards';
 import { Confetti } from '../components/Confetti';
 import { n, pct } from '../lib/format';
 
@@ -51,9 +52,9 @@ export function StageTestPage() {
       <Page>
         {stars > 0 && <Confetti />}
         <div className="flex flex-col items-center gap-3 text-center">
-          <Hoopoe size={88} mood={stars ? 'cheer' : 'sad'} />
+          <span className={stars ? 'animate-bob' : ''}><Hoopoe size={88} mood={stars ? 'cheer' : 'sad'} /></span>
           <h1 className="text-2xl font-extrabold">{stars ? 'قبول شدی!' : 'این بار نشد'}</h1>
-          <p className="text-4xl">{stars ? '⭐'.repeat(stars) : '—'}</p>
+          <StarRow value={stars} />
           <p className="text-muted">نمره: {pct(score)} (قبولی از {pct(STAGE_TEST_PASS)})</p>
           <Button className="mt-4 w-full" onClick={() => navigate('/')}>بازگشت به مسیر</Button>
         </div>

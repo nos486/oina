@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router';
 import type { Stage } from '@oina/shared';
 import { averageStrength, letterKey, nextLesson, sessionProgress, WEAK_THRESHOLD } from '@oina/engine';
@@ -8,6 +8,7 @@ import { useSavedSession } from '../state/savedSession';
 import { Page, ProgressBar } from '../components/ui';
 import { Cyr } from '../components/Cyr';
 import { Hoopoe } from '../components/Hoopoe';
+import { TodayCard } from '../components/TodayCard';
 import { n, pct } from '../lib/format';
 
 /** Height of one step on the path; the connector line is drawn through the node centres. */
@@ -52,7 +53,7 @@ function ContinueCard() {
   const stage = index.stages.find((s) => s.lessons.includes(lesson.id));
   const letters = lesson.newLetters.map((l) => index.letterById.get(l)!.upper).join(' ');
   return (
-    <div className="mb-8 overflow-hidden rounded-3xl border-2 border-line bg-surface">
+    <div className="mb-3 overflow-hidden rounded-3xl border-2 border-line bg-surface">
       <div className="flex items-center gap-4 p-4">
         <div style={accent(stage?.id ?? 1)} className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[var(--accent)] text-xl font-bold text-white">
           <Cyr>{letters || '★'}</Cyr>
@@ -88,15 +89,7 @@ export function PathPage() {
   const now = new Date();
   const next = nextLesson(index, p.completedLessons);
   const target = saved?.lessonId ?? next?.id;
-  const targetRef = useRef<HTMLAnchorElement>(null);
 
-  // Bring the lesson to play into view once, when the path opens.
-  useEffect(() => {
-    const el = targetRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.top > window.innerHeight * 0.8) el.scrollIntoView({ block: 'center' });
-  }, []);
 
   const open = index.stages.filter((s) => !s.comingSoon && s.lessons.length);
   const soon = index.stages.filter((s) => s.comingSoon || !s.lessons.length);
@@ -160,7 +153,6 @@ export function PathPage() {
                     </span>
                   )}
                   <Link
-                    ref={isTarget ? targetRef : undefined}
                     to={`/lesson/${id}`}
                     aria-label={`درس ${lesson.titleFa}${done ? '، تمام‌شده' : ''}${cracked ? '، نیاز به مرور' : ''}${isTarget && saved ? '، نیمه‌کاره' : ''}`}
                     className={`relative grid h-20 w-20 place-items-center rounded-full border-b-8 text-xl font-bold transition active:translate-y-1 active:border-b-4 ${
@@ -210,6 +202,7 @@ export function PathPage() {
   return (
     <Page>
       <ContinueCard />
+      <TodayCard />
       {open.map(renderStage)}
       {soon.length > 0 && (
         <section aria-label="به‌زودی" className="mb-6">

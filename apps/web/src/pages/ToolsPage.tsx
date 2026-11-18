@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react';
 import type { DailyGoal, Settings } from '@oina/shared';
-import { BADGES, levelInfo, maxStars, totalStars } from '@oina/engine';
-import { useContent } from '../state/content';
 import { progressStore, useProgress } from '../state/progress';
 import { AccountCard } from '../components/AccountCard';
-import { Button, Card, Page, ProgressBar } from '../components/ui';
+import { Link } from 'react-router';
+import { Button, Card, Page } from '../components/ui';
 import { n } from '../lib/format';
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
@@ -18,8 +17,6 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 
 export function ToolsPage() {
   const p = useProgress();
-  const index = useContent();
-  const lvl = levelInfo(p.xp);
   const [msg, setMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const set = (patch: Partial<Settings>) => progressStore.update((x) => ({ ...x, settings: { ...x.settings, ...patch } }));
@@ -34,7 +31,8 @@ export function ToolsPage() {
   };
 
   return (
-    <Page title="ابزار و تنظیمات">
+    <Page title="تنظیمات">
+      <Link to="/profile" className="mb-3 inline-block font-semibold text-primary">› بازگشت به صفحه‌ی من</Link>
       <AccountCard />
 
       <Card className="mb-4">
@@ -68,35 +66,9 @@ export function ToolsPage() {
         <Toggle label="جان (قلب)" checked={p.settings.hearts} onChange={(v) => set({ hearts: v })} />
       </Card>
 
-      <Card className="mb-4">
-        <h2 className="mb-2 text-lg font-bold">پیشرفت من</h2>
-        <div className="mb-3 grid grid-cols-3 gap-2 text-center">
-          <div><div className="text-2xl font-extrabold text-primary">{n(lvl.level)}</div><div className="text-xs text-muted">سطح</div></div>
-          <div><div className="text-2xl font-extrabold text-gold">{n(totalStars(p))}</div><div className="text-xs text-muted">ستاره از {n(maxStars(index))}</div></div>
-          <div><div className="text-2xl font-extrabold">{n(p.xp)}</div><div className="text-xs text-muted">امتیاز</div></div>
-        </div>
-        <ProgressBar value={lvl.fraction} />
-        <p className="mt-1 text-xs text-muted">{n(lvl.next - p.xp)} امتیاز تا سطح {n(lvl.level + 1)}</p>
-      </Card>
-
-      <Card className="mb-4">
-        <h2 className="mb-2 text-lg font-bold">نشان‌ها</h2>
-        <ul className="grid grid-cols-2 gap-2">
-          {BADGES.map((b) => {
-            const has = p.badges.includes(b.id);
-            return (
-              <li key={b.id} className={`rounded-2xl border-2 border-line p-3 ${has ? '' : 'opacity-40'}`}>
-                <p className="font-bold">{has ? '🏅' : '🔒'} {b.titleFa}</p>
-                <p className="text-xs text-muted">{b.descriptionFa}</p>
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
-
       <Card>
         <h2 className="mb-2 text-lg font-bold">پیشرفت</h2>
-        <p className="mb-3 text-sm text-muted">پیشرفتت فقط در همین مرورگر ذخیره می‌شود. برای انتقال به دستگاه دیگر، خروجی بگیر و آنجا وارد کن.</p>
+        <p className="mb-3 text-sm text-muted">بدون حساب، پیشرفتت فقط در همین مرورگر ذخیره می‌شود. برای انتقال به دستگاه دیگر وارد حساب شو، یا خروجی بگیر و آنجا وارد کن.</p>
         <div className="flex flex-col gap-2">
           <Button variant="secondary" onClick={exportFile}>خروجی JSON</Button>
           <Button variant="secondary" onClick={() => fileRef.current?.click()}>ورود از JSON</Button>
