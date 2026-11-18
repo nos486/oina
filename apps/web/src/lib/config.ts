@@ -11,4 +11,6 @@ export function resolveApiBase(raw: string | undefined): string {
 }
 
 export const API_BASE = resolveApiBase(import.meta.env.VITE_API_BASE);
+/** Kill switch: VITE_AUDIO=off hides every sound button and audio exercise, whatever the manifest says. */
+export const AUDIO_ENABLED = (import.meta.env.VITE_AUDIO ?? 'on').trim().toLowerCase() !== 'off';
 export const AUDIO_BASE = trimSlash(import.meta.env.VITE_AUDIO_BASE ?? '/audio') + '/';

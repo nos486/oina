@@ -49,16 +49,18 @@ Words marked `"needsReview": true` need a Tajik speaker to confirm the spelling 
 ## Audio
 
 Tajik audio comes from files (browsers have no Tajik voice); Russian uses the browser voice (Web Speech, ru-RU).
-A sound button is greyed out until its file is listed in `content/audio-manifest.json`.
+A sound button (and any listening exercise) only appears when its file is listed in `content/audio-manifest.json`.
+Set `VITE_AUDIO=off` on the Pages build to hide all audio regardless.
 
-All 245 Tajik files (35 letter names, 35 letter sounds, 175 words) are placeholders generated with
-Meta's MMS model `facebook/mms-tts-tgk` (CC-BY-NC-4.0, allowed because Oina is free). Replace any
-of them with a real recording at the same path.
+Current state: **words only**. Word clips are generated with `re-skill/orpheus-tj-early` (Apache-2.0) and kept
+only when Tajik speech recognition (`facebook/mms-1b-all`) hears exactly the written word; words that never
+pass have no file. **Letter names and sounds have no audio**: no model reads isolated Tajik letters well, so
+they wait for a real recording. An earlier attempt with `facebook/mms-tts-tgk` was too inaccurate and was removed.
 
-1. Generate missing files (or `--force` to redo all). Needs Python 3.10+ and ffmpeg:
+1. Generate missing word clips (Python 3.10+, ffmpeg, ~16 GB RAM):
    ```sh
-   python -m venv .venv && . .venv/bin/activate && pip install torch transformers numpy
-   python scripts/tts/generate_tg_audio.py
+   python -m venv .venv && . .venv/bin/activate && pip install torch transformers snac numpy
+   python scripts/tts/orpheus_tg.py
    ```
    Or put recordings in `apps/web/public/audio/` using the names in `public/audio/README.md`
    (e.g. `tg/words/kafsh.mp3`, `tg/letters/sha-sound.mp3`). Format: mp3, mono, 64 kbps, about 0.15 s of silence before and 0.2 s after.

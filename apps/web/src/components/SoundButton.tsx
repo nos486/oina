@@ -2,13 +2,14 @@ import { useContent } from '../state/content';
 import { useProgress } from '../state/progress';
 import { playAudio } from '../lib/audio';
 
-/** Plays a recorded file. Greyed out when the file does not exist yet (design doc, section 6). */
+/** Plays a recorded file. Hidden when the file is not in the audio manifest; greyed out when sound is off in settings. */
 export function SoundButton({ path, slow = false, size = 'md', label = 'پخش صدا' }: { path?: string; slow?: boolean; size?: 'md' | 'lg'; label?: string }) {
   const { audio } = useContent();
   const { settings } = useProgress();
   const hasFile = !!path && audio.has(path);
   const available = hasFile && settings.sound;
-  const why = !hasFile ? 'صدا هنوز ضبط نشده' : 'صدا در تنظیمات خاموش است';
+  if (!hasFile) return null;
+  const why = 'صدا در تنظیمات خاموش است';
   const dim = size === 'lg' ? 'h-16 w-16 text-2xl' : 'h-11 w-11 text-lg';
   return (
     <button
