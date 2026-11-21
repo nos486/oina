@@ -172,7 +172,7 @@ export function PathPage() {
                     {cracked && <span className="absolute -top-1 -left-1 rounded-full bg-cat-trap px-1.5 text-xs text-white">مرور</span>}
                   </Link>
                 </div>
-                <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg px-2 py-0.5">
+                <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg/60 px-2 py-0.5 backdrop-blur-sm">
                   <span className="text-sm font-semibold">{lesson.titleFa}</span>
                   {done && <Stars value={level} label={`سطح ${n(level)} از ۳`} />}
                 </span>
@@ -189,7 +189,7 @@ export function PathPage() {
                 🏆
               </Link>
             </div>
-            <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg px-2 py-0.5">
+            <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg/60 px-2 py-0.5 backdrop-blur-sm">
               <span className="text-sm font-semibold">آزمون مرحله</span>
               {testStars > 0 && <Stars value={testStars} label={`${n(testStars)} ستاره`} />}
             </span>
