@@ -5,13 +5,13 @@
  * - Audio (/audio/*): cached after the first play.
  * The content bundle comes from the API and is already kept in localStorage by the app.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = `oina-shell-${VERSION}`;
 const ASSETS = `oina-assets-${VERSION}`;
 const AUDIO = `oina-audio-${VERSION}`;
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(SHELL).then((c) => c.addAll(['/', '/manifest.webmanifest', '/icon.svg'])).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(SHELL).then((c) => c.addAll(['/', '/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/apple-touch-icon.png'])).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {

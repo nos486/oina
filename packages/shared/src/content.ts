@@ -103,7 +103,11 @@ export interface Stage {
 export interface Reading {
   id: string;
   titleFa: string;
+  /** Poet or source, e.g. "رودکی". */
+  sourceFa?: string;
   level: number;
+  kind?: 'everyday' | 'proverb' | 'poem';
+  /** Each line must have the same number of space-separated words in both scripts (word-by-word reveal). */
   lines: MiniReading[];
 }
 

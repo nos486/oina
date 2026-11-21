@@ -120,7 +120,7 @@ export function ProfilePage() {
   const wordsRead = Object.entries(p.items).filter(([k, v]) => k.startsWith('word:') && v.correct > 0).length;
 
   return (
-    <Page>
+    <Page wide>
       <div className="mb-4 overflow-hidden rounded-3xl bg-primary p-5 text-primary-ink shadow-[0_6px_0_0_rgb(0_0_0/0.15)]">
         <div className="flex items-center gap-4">
           <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full bg-white/20">
@@ -160,12 +160,14 @@ export function ProfilePage() {
         <ProgressBar value={Math.min(1, xpToday(p, now) / p.dailyGoal)} />
       </Card>
 
-      <PracticeCalendar />
-      <LetterMastery />
+      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-4">
+        <PracticeCalendar />
+        <LetterMastery />
+      </div>
 
       <Card className="mb-4">
         <h2 className="mb-3 text-lg font-bold">نشان‌ها <span className="text-sm font-normal text-muted">{n(p.badges.length)} از {n(BADGES.length)}</span></h2>
-        <ul className="grid grid-cols-2 gap-2">
+        <ul className="grid grid-cols-2 gap-2 lg:grid-cols-3">
           {BADGES.map((b) => {
             const has = p.badges.includes(b.id);
             return (

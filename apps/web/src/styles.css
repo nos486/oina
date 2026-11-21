@@ -38,6 +38,10 @@
   --stage-4: #7048e8;
   --stage-5: #2f9e44;
   --stage-6: #d6336c;
+  --pattern-color: #0f9b97;
+  --pattern-opacity: 0.065;
+  --glow: #d5f0ee;
+  --shadow: 0 1px 2px rgb(29 42 44 / 0.04), 0 10px 28px -18px rgb(29 42 44 / 0.28);
   color-scheme: light;
 }
 .dark {
@@ -66,6 +70,10 @@
   --stage-4: #5f3dc4;
   --stage-5: #2b8a3e;
   --stage-6: #a61e4d;
+  --pattern-color: #2cc5bf;
+  --pattern-opacity: 0.04;
+  --glow: #12302f;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 12px 30px -18px rgb(0 0 0 / 0.6);
   color-scheme: dark;
 }
 
@@ -103,6 +111,84 @@ body {
   color: var(--ink);
   font-family: var(--font-fa);
   min-height: 100dvh;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Background: a soft glow and a faint girih pattern (eight-pointed stars, as in Persian tilework).
+ * Drawn as a mask so it takes the theme colour; fixed so it stays put while the page scrolls.
+ */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  background:
+    radial-gradient(60rem 40rem at 100% -10%, var(--glow), transparent 60%),
+    radial-gradient(50rem 36rem at -10% 110%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 60%);
+}
+body::after {
+  background-color: var(--pattern-color);
+  opacity: var(--pattern-opacity);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M40 22l5.3 12.7L58 40l-12.7 5.3L40 58l-5.3-12.7L22 40l12.7-5.3z'/%3E%3Crect x='29' y='29' width='22' height='22' transform='rotate(45 40 40)'/%3E%3Crect x='29' y='29' width='22' height='22'/%3E%3Cpath d='M40 0v10M40 70v10M0 40h10M70 40h10M0 0l12 12M80 0L68 12M0 80l12-12M80 80L68 68'/%3E%3Ccircle cx='40' cy='40' r='3'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 80px 80px repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M40 22l5.3 12.7L58 40l-12.7 5.3L40 58l-5.3-12.7L22 40l12.7-5.3z'/%3E%3Crect x='29' y='29' width='22' height='22' transform='rotate(45 40 40)'/%3E%3Crect x='29' y='29' width='22' height='22'/%3E%3Cpath d='M40 0v10M40 70v10M0 40h10M70 40h10M0 0l12 12M80 0L68 12M0 80l12-12M80 80L68 68'/%3E%3Ccircle cx='40' cy='40' r='3'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 80px 80px repeat;
+}
+
+/* Frosted bars (top bar, tab bar). */
+.glass {
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+}
+.card {
+  box-shadow: var(--shadow);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  background: var(--surface-2);
+  font-variant-numeric: tabular-nums;
+}
+.kbd {
+  display: inline-block;
+  min-width: 1.5em;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 0.4rem;
+  padding: 0 0.3em;
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+/* App feel: no text selection or callouts on controls, no rubber-band in the installed app. */
+a,
+button,
+nav {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+@media (display-mode: standalone) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+@media (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
 }
 .cyr {
   font-family: var(--font-cyr);

@@ -200,27 +200,34 @@ export function PathPage() {
   };
 
   return (
-    <Page>
-      <ContinueCard />
-      <TodayCard />
-      {open.map(renderStage)}
-      {soon.length > 0 && (
-        <section aria-label="به‌زودی" className="mb-6">
-          <p className="mb-3 font-bold text-muted">به‌زودی</p>
-          <ul className="flex flex-col gap-3">
-            {soon.map((s) => (
-              <li key={s.id} className="flex items-center gap-3 rounded-3xl border-2 border-dashed border-line p-4 text-muted">
-                <span aria-hidden className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2">🔒</span>
-                <div>
-                  <p className="text-sm">مرحله‌ی {n(s.id)}</p>
-                  <p className="font-bold text-ink">{s.titleFa}</p>
-                  <p className="text-sm">{s.descriptionFa}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+    <Page wide>
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-8">
+        {/* On desktop the continue and today cards sit in a sticky side column next to the path. */}
+        <aside className="lg:sticky lg:top-8 lg:order-last">
+          <ContinueCard />
+          <TodayCard />
+        </aside>
+        <div className="min-w-0">
+          {open.map(renderStage)}
+          {soon.length > 0 && (
+            <section aria-label="به‌زودی" className="mb-6">
+              <p className="mb-3 font-bold text-muted">به‌زودی</p>
+              <ul className="flex flex-col gap-3">
+                {soon.map((s) => (
+                  <li key={s.id} className="flex items-center gap-3 rounded-3xl border-2 border-dashed border-line p-4 text-muted">
+                    <span aria-hidden className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2">🔒</span>
+                    <div>
+                      <p className="text-sm">مرحله‌ی {n(s.id)}</p>
+                      <p className="font-bold text-ink">{s.titleFa}</p>
+                      <p className="text-sm">{s.descriptionFa}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      </div>
     </Page>
   );
 }

@@ -1,40 +1,30 @@
 import { Link } from 'react-router';
-import { MAX_HEARTS, currentStreak, levelForXp, totalStars, xpToday } from '@oina/engine';
-import { useProgress } from '../state/progress';
+import { MAX_HEARTS } from '@oina/engine';
 import { n } from '../lib/format';
+import { GoalRing, useStats } from './Stats';
+import { IconConvert } from './icons';
 
-function GoalRing({ value, goal }: { value: number; goal: number }) {
-  const r = 14;
-  const c = 2 * Math.PI * r;
-  const f = Math.min(1, value / goal);
-  return (
-    <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden>
-      <circle cx="18" cy="18" r={r} stroke="var(--line)" strokeWidth="4" fill="none" />
-      <circle cx="18" cy="18" r={r} stroke="var(--gold)" strokeWidth="4" fill="none" strokeDasharray={c} strokeDashoffset={c * (1 - f)} strokeLinecap="round" transform="rotate(-90 18 18)" />
-    </svg>
-  );
-}
-
+/** Phone header: daily goal, streak, stars, level. Hidden on desktop (the sidebar has the same). */
 export function TopBar() {
-  const p = useProgress();
-  const now = new Date();
-  const today = xpToday(p, now);
-  const streak = currentStreak(p, now);
+  const { p, today, goal, streak, stars, level } = useStats();
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-bg/95 backdrop-blur">
-      <div className="mx-auto flex max-w-[720px] items-center justify-between gap-2 px-4 py-2">
-        <div className="flex items-center gap-1" aria-label={`هدف امروز: ${n(today)} از ${n(p.dailyGoal)} امتیاز`}>
-          <GoalRing value={today} goal={p.dailyGoal} />
-          <span className="text-sm font-semibold">{n(today)}/{n(p.dailyGoal)}</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm font-semibold">
-          <span aria-label={`روزشمار: ${n(streak)} روز`} className={streak ? 'text-cat-trap' : 'text-muted'}>🔥 {n(streak)}</span>
-          <span aria-label={`ستاره: ${n(totalStars(p))}`}>⭐ {n(totalStars(p))}</span>
-          <Link to="/profile" aria-label={`سطح ${n(levelForXp(p.xp))}`} className="rounded-lg bg-primary-soft px-1.5 text-primary">سطح {n(levelForXp(p.xp))}</Link>
-          {p.settings.hearts && (
-            <span aria-label={`جان: ${n(p.hearts.count)} از ${n(MAX_HEARTS)}`} className="text-bad">♥ {n(p.hearts.count)}</span>
+    <header className="glass sticky top-0 z-20 border-b border-line/70 pt-[env(safe-area-inset-top)] md:hidden">
+      <div className="mx-auto flex h-14 max-w-[720px] items-center justify-between gap-2 px-4">
+        <Link to="/profile" className="flex items-center gap-1.5" aria-label={`هدف امروز: ${n(today)} از ${n(goal)} امتیاز`}>
+          <GoalRing value={today} goal={goal} size={32} />
+          <span className="text-sm font-bold tabular-nums">{n(today)}/{n(goal)}</span>
+        </Link>
+        <div className="flex items-center gap-1.5 text-sm font-bold">
+          <span aria-label={`روزشمار: ${n(streak)} روز`} className={`chip ${streak ? 'text-cat-trap' : 'text-muted'}`}>🔥 {n(streak)}</span>
+          <span aria-label={`ستاره: ${n(stars)}`} className="chip">⭐ {n(stars)}</span>
+          {p.settings.hearts ? (
+            <span aria-label={`جان: ${n(p.hearts.count)} از ${n(MAX_HEARTS)}`} className="chip text-bad">♥ {n(p.hearts.count)}</span>
+          ) : (
+            <Link to="/profile" aria-label={`سطح ${n(level.level)}`} className="chip bg-primary-soft text-primary">سطح {n(level.level)}</Link>
           )}
-          <Link to="/review" className="rounded-xl bg-primary-soft px-3 py-1.5 text-primary" aria-label="مرور">مرور</Link>
+          <Link to="/converter" aria-label="مبدل خط" className="grid h-9 w-9 place-items-center rounded-full text-primary transition active:scale-90 hover:bg-primary-soft">
+            <IconConvert width={20} height={20} />
+          </Link>
         </div>
       </div>
     </header>

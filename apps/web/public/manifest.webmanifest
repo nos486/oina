@@ -1,15 +1,27 @@
 {
+  "id": "/",
   "name": "آینه · Оина",
   "short_name": "آینه",
-  "description": "فارسی را با خطی دیگر بخوان",
+  "description": "فارسی را با خطی دیگر بخوان — آموزش رایگان خواندن خط سیریلیک تاجیکی",
   "lang": "fa",
   "dir": "rtl",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#faf6ee",
   "theme_color": "#0f9b97",
+  "categories": ["education", "books"],
   "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "مرور", "short_name": "مرور", "url": "/review", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "مبدل خط", "short_name": "مبدل", "url": "/converter", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "اتاق مطالعه", "short_name": "خواندن", "url": "/reading", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
   ]
 }

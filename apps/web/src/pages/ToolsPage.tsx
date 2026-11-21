@@ -32,13 +32,13 @@ export function ToolsPage() {
 
   return (
     <Page title="تنظیمات">
-      <Link to="/profile" className="mb-3 inline-block font-semibold text-primary">› بازگشت به صفحه‌ی من</Link>
+      <Link to="/profile" className="mb-3 inline-block font-semibold text-primary md:hidden">› بازگشت به صفحه‌ی من</Link>
       <AccountCard />
 
-      <Card className="mb-4">
-        <h2 className="mb-1 text-lg font-bold">مبدل سیریلیک ← فارسی</h2>
-        <p className="text-muted">به‌زودی (نسخه‌ی ۱٫۱)</p>
-      </Card>
+      <Link to="/converter" className="card mb-4 flex min-h-14 items-center justify-between rounded-3xl border-2 border-line bg-surface px-4 font-bold">
+        <span>🔤 مبدل سیریلیک ← فارسی</span>
+        <span aria-hidden className="text-muted">‹</span>
+      </Link>
 
       <Card className="mb-4">
         <h2 className="mb-2 text-lg font-bold">تنظیمات</h2>

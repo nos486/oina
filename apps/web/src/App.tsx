@@ -1,6 +1,10 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router';
 import { TopBar } from './components/TopBar';
 import { BottomNav } from './components/BottomNav';
+import { Sidebar } from './components/Sidebar';
+import { ConverterPage } from './pages/ConverterPage';
+import { ReaderPage } from './pages/ReaderPage';
 import { PathPage } from './pages/PathPage';
 import { AlphabetPage } from './pages/AlphabetPage';
 import { ReviewPage } from './pages/ReviewPage';
@@ -15,15 +19,31 @@ import { AdminPage } from './pages/AdminPage';
 import { useProgress } from './state/progress';
 import { useApplySettings } from './state/settings';
 
+/** Like a native app: every new screen starts at the top. */
+function useScrollTopOnNavigate() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [pathname]);
+}
+
+/**
+ * The app shell. Phones: top bar + bottom tab bar. Desktop (md and up): a sidebar on the
+ * right (RTL start) and a wide content area, like a desktop app.
+ */
 function TabsLayout() {
   const { onboarded } = useProgress();
+  useScrollTopOnNavigate();
   if (!onboarded) return <Navigate to="/welcome" replace />;
   return (
-    <>
-      <TopBar />
+    <div className="min-h-dvh md:grid md:grid-cols-[256px_minmax(0,1fr)] lg:grid-cols-[272px_minmax(0,1fr)]">
+      <Sidebar />
+      <div className="min-w-0">
+        <TopBar />
+        <Outlet />
+      </div>
       <BottomNav />
-      <Outlet />
-    </>
+    </div>
   );
 }
 
@@ -46,6 +66,8 @@ export function App() {
         <Route path="/alphabet" element={<AlphabetPage />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/reading" element={<ReadingPage />} />
+        <Route path="/reading/:id" element={<ReaderPage />} />
+        <Route path="/converter" element={<ConverterPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/tools" element={<ToolsPage />} />
         <Route path="/admin" element={<AdminPage />} />

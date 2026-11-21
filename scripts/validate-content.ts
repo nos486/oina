@@ -1,9 +1,18 @@
 /** pnpm content:validate — fails (exit 1) when content breaks the rules in the design doc. */
-import { validateContent } from '@oina/engine';
-import { loadBundle } from './lib/load-content.js';
+import type { Reading } from '@oina/shared';
+import { splitWords, validateContent } from '@oina/engine';
+import { loadBundle, readJson } from './lib/load-content.js';
 
 const bundle = loadBundle();
 const issues = validateContent(bundle);
+// Reading room: word-by-word reveal needs the same word count in both scripts.
+for (const r of readJson<Reading[]>('readings.json')) {
+  r.lines.forEach((l, i) => {
+    const a = splitWords(l.cyrillic).length;
+    const b = splitWords(l.persian).length;
+    if (a !== b) issues.push({ level: 'error', where: `reading ${r.id} line ${i + 1}`, message: `${a} Cyrillic words but ${b} Persian words` });
+  });
+}
 const errors = issues.filter((i) => i.level === 'error');
 const warnings = issues.filter((i) => i.level === 'warning');
 const verbose = process.argv.includes('--verbose');

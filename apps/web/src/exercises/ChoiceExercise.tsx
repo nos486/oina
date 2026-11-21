@@ -22,11 +22,11 @@ export function ChoiceExercise({
     if (q.prompt.audioOnly && q.prompt.audio && settings.sound) void playAudio(q.prompt.audio);
   }, [q.id, q.prompt.audio, q.prompt.audioOnly, settings.sound]);
 
-  // Keys 1–4 choose an option.
+  // Keys 1–4 choose an option (Latin or Persian digits, so a Persian keyboard works too).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (locked) return;
-      const i = Number(e.key) - 1;
+      if (locked || e.ctrlKey || e.metaKey || e.altKey) return;
+      const i = Math.max('1234'.indexOf(e.key), '۱۲۳۴'.indexOf(e.key), '١٢٣٤'.indexOf(e.key));
       const opt = q.options[i];
       if (opt) onChange({ type: 'choice', optionId: opt.id }, opt.id);
     };
