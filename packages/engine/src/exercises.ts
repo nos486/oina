@@ -3,7 +3,6 @@
  * reports a response; grading lives here too.
  */
 import type { ItemKey, Lesson, Letter, Progress, Word } from '@oina/shared';
-import { audioPath } from '@oina/shared';
 import type { ContentIndex } from './content-index.js';
 import { lessonsBefore, lettersTaughtThrough, splitLetters } from './content-index.js';
 import { letterKey, parseItemKey, wordKey } from './progress.js';
@@ -27,20 +26,18 @@ interface BaseQuestion {
   itemKey: ItemKey;
   /** Short hint shown in the feedback bar after a wrong answer. */
   tip?: string;
-  /** Audio to auto-play on feedback (path relative to audio base), only if it exists. */
-  feedbackAudio?: string;
 }
 
 export interface ChoiceQuestion extends BaseQuestion {
   type: 'letterToSound' | 'soundToLetter' | 'readWord' | 'spotTrap';
-  prompt: { text: string; script: Script; audio?: string; audioOnly?: boolean };
+  prompt: { text: string; script: Script };
   options: ChoiceOption[];
   correctId: string;
 }
 
 export interface BuildWordQuestion extends BaseQuestion {
   type: 'buildWord';
-  prompt: { text: string; script: 'fa'; audio?: string };
+  prompt: { text: string; script: 'fa' };
   tiles: { id: string; label: string }[];
   /** Tile labels in the right order. */
   answer: string[];
@@ -102,10 +99,6 @@ export interface Ctx {
 let seq = 0;
 const qid = (type: string, key: string) => `${type}:${key}:${(seq++).toString(36)}`;
 
-function audioIf(index: ContentIndex, path: string): string | undefined {
-  return index.audio.has(path) ? path : undefined;
-}
-
 function editDistance(a: string, b: string): number {
   const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array<number>(b.length).fill(0)]);
   for (let j = 1; j <= b.length; j++) dp[0]![j] = j;
@@ -140,17 +133,15 @@ export function letterToSound(ctx: Ctx, letter: Letter): ChoiceQuestion {
     id: qid('letterToSound', letter.id),
     type: 'letterToSound',
     itemKey: key,
-    prompt: { text: `${letter.upper} ${letter.lower}`, script: 'cyr', audio: audioIf(ctx.index, audioPath.letterSound(letter.id)) },
+    prompt: { text: `${letter.upper} ${letter.lower}`, script: 'cyr' },
     options,
     correctId: correct,
     tip: `${letter.upper} = ${letter.persian.join(' / ')} — ${letter.mnemonicFa}`,
-    feedbackAudio: audioIf(ctx.index, audioPath.letterName(letter.id)),
   };
 }
 
 export function soundToLetter(ctx: Ctx, letter: Letter): ChoiceQuestion {
   const key = letterKey(letter.id);
-  const audio = audioIf(ctx.index, audioPath.letterSound(letter.id));
   const ids: string[] = [];
   for (const c of topConfusions(ctx.progress, key)) {
     const parsed = parseItemKey(c);
@@ -172,8 +163,7 @@ export function soundToLetter(ctx: Ctx, letter: Letter): ChoiceQuestion {
     id: qid('soundToLetter', letter.id),
     type: 'soundToLetter',
     itemKey: key,
-    // Without a recording we show the Persian letter instead of playing a sound.
-    prompt: audio ? { text: letter.persian[0]!, script: 'fa', audio, audioOnly: true } : { text: letter.persian[0]!, script: 'fa' },
+    prompt: { text: letter.persian[0]!, script: 'fa' },
     options,
     correctId: letter.id,
     tip: `«${letter.persian[0]}» = ${letter.upper} ${letter.lower}`,
@@ -210,7 +200,6 @@ export function readWord(ctx: Ctx, word: Word): ChoiceQuestion {
   pool.push(...near);
   const wrong = [...new Set(pool)].filter((p) => p !== word.persian).slice(0, 3);
   const options = shuffle([word.persian, ...wrong], ctx.rng).map((p) => ({ id: p, label: p, script: 'fa' as const }));
-  const audio = audioIf(ctx.index, audioPath.word(word));
   return {
     id: qid('readWord', word.id),
     type: 'readWord',
@@ -219,7 +208,6 @@ export function readWord(ctx: Ctx, word: Word): ChoiceQuestion {
     options,
     correctId: word.persian,
     tip: word.meaningFa ? `${word.cyrillic} = ${word.persian} (${word.meaningFa})` : `${word.cyrillic} = ${word.persian}`,
-    feedbackAudio: audio,
   };
 }
 
@@ -237,7 +225,7 @@ export function buildWord(ctx: Ctx, word: Word): BuildWordQuestion | null {
     id: qid('buildWord', word.id),
     type: 'buildWord',
     itemKey: wordKey(word.id),
-    prompt: { text: word.persian, script: 'fa', audio: audioIf(ctx.index, audioPath.word(word)) },
+    prompt: { text: word.persian, script: 'fa' },
     tiles,
     answer: lower,
     tip: `${word.persian} = ${word.cyrillic}`,

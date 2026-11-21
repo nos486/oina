@@ -46,7 +46,7 @@ export function AdminPage() {
               ['حرف', stats.letters],
               ['کلمه', stats.words],
               ['درس', stats.lessons],
-              ['فایل صوتی', stats.audioFiles],
+              ['مرحله', stats.stages],
             ].map(([label, value]) => (
               <Card key={label as string}>
                 <div className="text-2xl font-extrabold">{n(value as number)}</div>

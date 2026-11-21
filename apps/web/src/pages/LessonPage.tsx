@@ -3,9 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router';
 import type { SessionState } from '@oina/engine';
 import {
   accuracy, addXp, awardBadges, BADGES, completeLesson, currentStreak, levelForXp, xpToday, contextFor, createRng, generateLessonQuestions,
-  letterKey, nextLevel, weakestItems,
+  checkpoints, letterKey, nextLevel, weakestItems,
 } from '@oina/engine';
-import { audioPath } from '@oina/shared';
 import { useContent } from '../state/content';
 import { progressStore } from '../state/progress';
 import { savedSession } from '../state/savedSession';
@@ -88,7 +87,7 @@ export function LessonPage() {
             earned = r.earned;
             return r.progress;
           });
-          fxFinish(progressStore.get().settings.sound);
+          fxFinish();
           const levelAfter = levelForXp(progressStore.get().xp);
           const after = progressStore.get();
           const goalReached = !goalBefore && xpToday(after, now) >= after.dailyGoal;
@@ -104,7 +103,11 @@ export function LessonPage() {
   const weak = weakestItems(p, [...new Set([...s.missed.filter((k) => k.startsWith('letter:')), ...lesson.newLetters.map(letterKey)])], now, 3, 50)
     .map((k) => index.letterById.get(k.slice(7))!)
     .filter(Boolean);
-  const words = lesson.words.map((w) => index.wordById.get(w)!).filter(Boolean);
+  const allWords = lesson.words.map((w) => index.wordById.get(w)!).filter(Boolean);
+  // New letters first, so a long list still shows what this lesson added.
+  const words = [...allWords.filter((w) => w.letters.some((l) => lesson.newLetters.includes(l))), ...allWords.filter((w) => !w.letters.some((l) => lesson.newLetters.includes(l)))].slice(0, 24);
+  const checkpoint = checkpoints(index).find((c) => c.afterLessonId === lesson.id);
+  const checkpointDue = checkpoint && !(p.reviewStars[checkpoint.id] ?? 0);
   const order = index.lessonOrder;
   const nextLesson = order[order.findIndex((l) => l.id === lesson.id) + 1];
 
@@ -144,18 +147,18 @@ export function LessonPage() {
         </Card>
       )}
       <Card className="mb-6">
-        <p className="mb-3 font-bold">الان این کلمه‌ها را می‌توانی بخوانی:</p>
+        <p className="mb-3 font-bold">الان این کلمه‌ها را می‌توانی بخوانی{allWords.length > words.length ? ` (${n(words.length)} از ${n(allWords.length)})` : ''}:</p>
         <ul className="flex flex-wrap gap-2">
           {words.map((w) => (
             <li key={w.id} className="rounded-xl bg-surface-2 px-3 py-1.5">
               <Cyr className="font-bold">{w.cyrillic}</Cyr> <span className="text-muted">= {w.persian}</span>
-              {index.audio.has(audioPath.word(w)) && ' 🔊'}
             </li>
           ))}
         </ul>
       </Card>
       <div className="flex flex-col gap-3">
-        {nextLesson && <Button onClick={() => navigate(`/lesson/${nextLesson.id}`)}>درس بعدی</Button>}
+        {checkpointDue && <Button onClick={() => navigate(`/checkpoint/${checkpoint.id}`)}>🔁 مرور درس‌های قبلی</Button>}
+        {nextLesson && <Button variant={checkpointDue ? 'secondary' : 'primary'} onClick={() => navigate(`/lesson/${nextLesson.id}`)}>درس بعدی</Button>}
         {level < 3 && <Button variant="secondary" onClick={() => navigate(`/lesson/${lesson.id}?again=${Date.now()}`, { replace: true })}>سطح بعدی همین درس</Button>}
         <Button variant="ghost" onClick={() => navigate('/')}>بازگشت به مسیر</Button>
       </div>

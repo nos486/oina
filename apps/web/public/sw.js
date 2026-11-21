@@ -2,20 +2,18 @@
  * Oina service worker: makes the app open offline and start fast.
  * - Page navigations: network first, falling back to the cached app shell (so new deploys show up at once).
  * - Hashed build files (/assets/*), fonts and icons: cache first (their names change on every build).
- * - Audio (/audio/*): cached after the first play.
  * The content bundle comes from the API and is already kept in localStorage by the app.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL = `oina-shell-${VERSION}`;
 const ASSETS = `oina-assets-${VERSION}`;
-const AUDIO = `oina-audio-${VERSION}`;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL).then((c) => c.addAll(['/', '/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/apple-touch-icon.png'])).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
-  const keep = new Set([SHELL, ASSETS, AUDIO]);
+  const keep = new Set([SHELL, ASSETS]);
   event.waitUntil(
     caches
       .keys()
@@ -53,7 +51,5 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(networkFirstPage(request));
   } else if (url.pathname.startsWith('/assets/') || url.pathname === '/icon.svg' || url.pathname === '/manifest.webmanifest') {
     event.respondWith(cacheFirst(request, ASSETS));
-  } else if (url.pathname.startsWith('/audio/') && !request.headers.has('range')) {
-    event.respondWith(cacheFirst(request, AUDIO));
   }
 });

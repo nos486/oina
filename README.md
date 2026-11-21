@@ -6,19 +6,19 @@ It teaches reading the script only, not a new language (a later path covers read
 
 Persian, right-to-left, mobile-first, dark mode. Progress lives in the browser (`localStorage`, key `progress:v1`).
 A lesson left halfway is kept on the device (`session:v1`, up to 3 days) and resumes from the same question.
-The app is a PWA: `public/sw.js` (registered in production builds) caches the app shell, build files and played
-audio so it opens offline and can be added to the home screen. Bump `VERSION` in `sw.js` to drop old caches.
+The app is a PWA: `public/sw.js` (registered in production builds) caches the app shell and build files
+so it opens offline and can be added to the home screen. Bump `VERSION` in `sw.js` to drop old caches.
 An Android app can be built later from the same web app.
 
 ## Layout
 
 ```
 apps/web         React + Vite + TypeScript + Tailwind → Cloudflare Pages
-apps/api         Cloudflare Worker (Hono) → serves content, later audio (R2) and sync (D1)
+apps/api         Cloudflare Worker (Hono) → serves content and sync (D1)
 packages/shared  Types shared by web, api and scripts (content model, Progress, API)
 packages/engine  Pure learning logic, no React: exercises, sessions, smart review, XP/streak/hearts
-content/         All learning content as JSON (letters, words, lessons, stages, readings, audio manifest)
-scripts/         validate-content, sync-word-letters, generate-audio-list
+content/         All learning content as JSON (letters, words, lessons, stages, readings)
+scripts/         validate-content, sync-word-letters
 ```
 
 The web app loads everything with one request, `GET /api/v1/content`, and keeps a copy for fast start and offline use.
@@ -49,34 +49,24 @@ Adding a word or a lesson is a JSON edit, no code:
 `"exercises": []` on a lesson means questions are generated automatically from its letters and words.
 Words marked `"needsReview": true` need a Tajik speaker to confirm the spelling before release.
 
-## Audio
+## No sound
 
-Tajik audio comes from files (browsers have no Tajik voice); Russian uses the browser voice (Web Speech, ru-RU).
-A sound button (and any listening exercise) only appears when its file is listed in `content/audio-manifest.json`.
-Set `VITE_AUDIO=off` on the Pages build to hide all audio regardless.
+The app has no audio at all: no recordings, no sound buttons, no listening exercises and no effect tones
+(only a short vibration on phones). Machine Tajik voices were too inaccurate and there is no Tajik speaker to
+record, so sound stays out until a real solution exists. Letter exercises compare the Cyrillic letter with
+its Persian letter instead.
 
-Current state: **words only**. Word clips are generated with `re-skill/orpheus-tj-early` (Apache-2.0) and kept
-only when Tajik speech recognition (`facebook/mms-1b-all`) hears exactly the written word; words that never
-pass have no file. **Letter names and sounds have no audio**: no model reads isolated Tajik letters well, so
-they wait for a real recording. An earlier attempt with `facebook/mms-tts-tgk` was too inaccurate and was removed.
+## Review, checkpoints and the exam
 
-1. Generate missing word clips (Python 3.10+, ffmpeg, ~16 GB RAM):
-   ```sh
-   python -m venv .venv && . .venv/bin/activate && pip install torch transformers snac numpy
-   python scripts/tts/orpheus_tg.py
-   ```
-   Or put recordings in `apps/web/public/audio/` using the names in `public/audio/README.md`
-   (e.g. `tg/words/kafsh.mp3`, `tg/letters/sha-sound.mp3`). Format: mp3, mono, 64 kbps, about 0.15 s of silence before and 0.2 s after.
-2. Run `pnpm audio:list`. It updates `content/audio-manifest.json` and writes `audio-missing.txt`.
-Human recordings: 67 of our words exist on [Lingua Libre](https://lingualibre.org) (CC0), listed in
-`content/audio-sources/lingualibre-tg.json`. Run the **Fetch Lingua Libre audio** GitHub Action (or
-`python3 scripts/audio/fetch_lingualibre.py && pnpm audio:list` locally) to download them; they replace the
-machine clips for those words. Credits: `apps/web/public/audio/CREDITS.md`.
-
-3. Commit and redeploy both the API (it serves the manifest) and the web app (it serves the files at `/audio/`).
-
-Later the files can move to R2: uncomment the `[[r2_buckets]]` block in `apps/api/wrangler.toml`,
-upload with the same paths, and set `VITE_AUDIO_BASE` to `https://<worker>/audio/`.
+- **Review checkpoints on the path**: after every second lesson of a stage (unless the stage test comes next)
+  there is a 🔁 node. It asks 12 questions plus a match board: about 60% from all older lessons, the rest from
+  the two lessons just before it, half weak items and half random. Stars at 60/80/95% first-try accuracy
+  (`Progress.reviewStars`). When one is due, the path's top card offers it before the next lesson.
+- **Review tab**: daily review, the general exam, letters / words / mixed practice, mistakes, practice by
+  stage, a strength summary and the newest words.
+- **General exam** (`/exam`): 20 questions spread round-robin over every finished stage, no retries, score with
+  letter/word breakdown and the mistakes at the end. History in `Progress.exams` (last 20).
+- Logic lives in `packages/engine/src/practice.ts`.
 
 ## Accounts and saved progress (D1)
 
@@ -134,12 +124,12 @@ In the Cloudflare dashboard: Workers & Pages → Create → Pages → connect th
 
 Or build locally and upload: `pnpm build:web && npx wrangler pages deploy apps/web/dist --project-name oina`.
 
-`public/_redirects` makes client-side routes work; `public/_headers` sets long caching for hashed assets and audio.
+`public/_redirects` makes client-side routes work; `public/_headers` sets long caching for hashed assets.
 
 ## What's in the MVP
 
-- Stages 1–6 (all 35 Tajik letters), 23 lessons, 175 words, mini readings.
-- Six exercise types: letter → sound, sound → letter, read the word, build the word, match pairs, spot the trap.
+- Stages 1–6 (all 35 Tajik letters), 23 lessons, 475 words, mini readings.
+- Six exercise types: letter → Persian letter, Persian letter → Cyrillic, read the word, build the word, match pairs, spot the trap.
 - Lesson flow: letter intro cards, ~10 questions easy → hard, results with weak letters and "words you can read now".
 - Three levels per lesson (stars), stage tests (80% passes and can skip a stage).
 - Smart review: wrong answers come back at the end of the lesson in another form; item strength with decay;

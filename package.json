@@ -19,7 +19,6 @@
     "test:e2e": "pnpm --filter @oina/web test:e2e",
     "content:validate": "tsx scripts/validate-content.ts",
     "content:sync": "tsx scripts/sync-word-letters.ts",
-    "audio:list": "tsx scripts/generate-audio-list.ts",
     "deploy:api": "pnpm --filter @oina/api deploy"
   },
   "devDependencies": {

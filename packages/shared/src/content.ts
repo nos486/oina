@@ -118,13 +118,4 @@ export interface ContentBundle {
   words: Word[];
   lessons: Lesson[];
   stages: Stage[];
-  /** Audio files that actually exist, relative to the audio base, e.g. "tg/letters/sha-name.mp3". */
-  audio: string[];
 }
-
-/** Audio file naming convention (design doc, section 6). */
-export const audioPath = {
-  letterName: (letterId: string) => `tg/letters/${letterId}-name.mp3`,
-  letterSound: (letterId: string) => `tg/letters/${letterId}-sound.mp3`,
-  word: (word: Pick<Word, 'id' | 'lang'>) => `${word.lang}/words/${word.id}.mp3`,
-};

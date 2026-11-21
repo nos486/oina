@@ -22,6 +22,5 @@ export function loadBundle(): ContentBundle {
     words: readJson<Word[]>('words.json'),
     lessons: readJson<Lesson[]>('lessons.json'),
     stages: readJson<Stage[]>('stages.json'),
-    audio: readJson<string[]>('audio-manifest.json'),
   };
 }

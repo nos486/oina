@@ -7,6 +7,7 @@ import type { ContentIndex } from './content-index.js';
 import { dayKey, daysBetween } from './time.js';
 import { MAX_HEARTS, letterKey, wordKey } from './progress.js';
 import { effectiveStrength } from './review-engine.js';
+import { checkpoints } from './practice.js';
 
 export const HEART_REFILL_MS = 30 * 60 * 1000;
 export const STAGE_TEST_PASS = 0.8;
@@ -122,14 +123,14 @@ export function levelInfo(xp: number): { level: number; current: number; next: n
   return { level, current, next, fraction: (xp - current) / (next - current) };
 }
 
-/** Stars collected: up to 3 per lesson (its levels) plus up to 3 per stage test. */
+/** Stars collected: up to 3 per lesson (its levels), per review checkpoint and per stage test. */
 export function totalStars(progress: Progress): number {
   const sum = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0);
-  return sum(progress.lessonLevels) + sum(progress.stageStars as Record<string, number>);
+  return sum(progress.lessonLevels) + sum(progress.stageStars as Record<string, number>) + sum(progress.reviewStars);
 }
 
 export function maxStars(index: ContentIndex): number {
-  return index.lessons.length * 3 + index.stages.filter((s) => s.lessons.length).length * 3;
+  return (index.lessons.length + index.stages.filter((s) => s.lessons.length).length + checkpoints(index).length) * 3;
 }
 
 export interface BadgeDef {

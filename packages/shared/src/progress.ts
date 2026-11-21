@@ -21,7 +21,6 @@ export interface ItemState {
 
 export interface Settings {
   track: Lang | 'both';
-  sound: boolean;
   /** 'system' follows the OS. */
   theme: 'system' | 'light' | 'dark';
   fontScale: number;
@@ -29,6 +28,14 @@ export interface Settings {
 }
 
 export type DailyGoal = 20 | 50 | 100;
+
+/** One general exam taken from the review tab. */
+export interface ExamRecord {
+  /** ISO date-time. */
+  at: string;
+  correct: number;
+  total: number;
+}
 
 /** Stored in localStorage under PROGRESS_STORAGE_KEY. Later synced via PUT /api/v1/progress. */
 export interface Progress {
@@ -42,6 +49,10 @@ export interface Progress {
   /** Up to 20 item keys, newest first. */
   recentMistakes: string[];
   lessonLevels: Record<string, 0 | 1 | 2 | 3>;
+  /** Stars of the review checkpoints on the path, by checkpoint id ("review-s2-1"). */
+  reviewStars: Record<string, 0 | 1 | 2 | 3>;
+  /** General exams, newest first (at most 20). */
+  exams: ExamRecord[];
   hearts: { count: number; lastRefill: string };
   dailyGoal: DailyGoal;
   /** "2026-11-17": 120 */

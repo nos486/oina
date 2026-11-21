@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { BuildWordQuestion, Response } from '@oina/engine';
 import { Cyr } from '../components/Cyr';
-import { SoundButton } from '../components/SoundButton';
 
 export function BuildWordExercise({ q, locked, onChange }: { q: BuildWordQuestion; locked: boolean; onChange: (r: Response | null) => void }) {
   const [picked, setPicked] = useState<string[]>([]);
@@ -18,7 +17,6 @@ export function BuildWordExercise({ q, locked, onChange }: { q: BuildWordQuestio
       <h2 className="text-xl font-bold">این کلمه را با حروف سیریلیک بساز</h2>
       <div className="flex items-center justify-center gap-4 rounded-3xl bg-surface-2 p-6">
         <span className="text-5xl font-extrabold">{q.prompt.text}</span>
-        {q.prompt.audio && <SoundButton path={q.prompt.audio} />}
       </div>
       <div dir="ltr" className="flex min-h-20 flex-wrap items-center justify-center gap-2 border-b-2 border-line pb-3" aria-label="کلمه‌ی ساخته‌شده">
         {picked.map((id) => {

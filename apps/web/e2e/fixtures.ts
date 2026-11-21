@@ -12,7 +12,6 @@ export const bundle = {
   words: read('words.json'),
   lessons: read('lessons.json'),
   stages: read('stages.json'),
-  audio: read('audio-manifest.json'),
 };
 
 /** Serves the content bundle without a running Worker. */
@@ -24,7 +23,7 @@ export async function mockApi(page: Page) {
 export async function seedProgress(page: Page, patch: Record<string, unknown> = {}) {
   await page.addInitScript((p) => {
     if (!localStorage.getItem('progress:v1')) {
-      localStorage.setItem('progress:v1', JSON.stringify({ version: 1, onboarded: false, settings: { hearts: false, sound: false }, ...p }));
+      localStorage.setItem('progress:v1', JSON.stringify({ version: 1, onboarded: false, settings: { hearts: false }, ...p }));
     }
   }, patch);
 }

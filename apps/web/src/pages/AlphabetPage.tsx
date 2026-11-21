@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import type { Letter } from '@oina/shared';
-import { audioPath } from '@oina/shared';
 import { effectiveStrength, letterKey, lettersLearned } from '@oina/engine';
 import { useContent } from '../state/content';
 import { useProgress } from '../state/progress';
 import { Card, Page } from '../components/ui';
 import { Cyr } from '../components/Cyr';
-import { SoundButton } from '../components/SoundButton';
 import { CATEGORY } from '../components/categories';
-import { playAudio } from '../lib/audio';
 import { n } from '../lib/format';
 
 /** The alphabet hall: all 35 letters coloured by category; unlearned ones are faded. */
@@ -34,10 +31,7 @@ export function AlphabetPage() {
             <button
               key={l.id}
               type="button"
-              onClick={() => {
-                setOpen(l);
-                if (index.audio.has(audioPath.letterName(l.id)) && p.settings.sound) void playAudio(audioPath.letterName(l.id));
-              }}
+              onClick={() => setOpen(l)}
               aria-label={`${l.upper}، ${l.persian[0]}`}
               className={`flex aspect-square flex-col items-center justify-center rounded-2xl border-2 border-b-4 border-line bg-surface ${learned.has(l.id) ? '' : 'opacity-40'}`}
             >
@@ -55,10 +49,6 @@ export function AlphabetPage() {
               <Cyr className={`text-7xl font-bold ${CATEGORY[open.category].color}`}>{open.upper} {open.lower}</Cyr>
               <p className="text-3xl font-extrabold">= {open.persian.join(' / ')}</p>
               <p className="text-sm text-muted">{CATEGORY[open.category].labelFa} · <span dir="ltr">/{open.ipa}/</span></p>
-              <div className="flex gap-2">
-                <SoundButton path={audioPath.letterSound(open.id)} />
-                <SoundButton path={audioPath.letterName(open.id)} label="نام حرف" />
-              </div>
               <p>💡 {open.mnemonicFa}</p>
               {open.russianNote && <p className="text-sm text-muted">در تابلوهای روسی: {open.russianNote}</p>}
               <ul className="flex flex-wrap justify-center gap-2">

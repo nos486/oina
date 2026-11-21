@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router';
+import { Navigate, Outlet, Route, Routes, useLocation, useSearchParams } from 'react-router';
 import { TopBar } from './components/TopBar';
 import { BottomNav } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
@@ -13,6 +13,8 @@ import { ToolsPage } from './pages/ToolsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { LessonPage } from './pages/LessonPage';
 import { StageTestPage } from './pages/StageTestPage';
+import { CheckpointPage } from './pages/CheckpointPage';
+import { ExamPage } from './pages/ExamPage';
 import { WelcomePage } from './pages/WelcomePage';
 import { LoginPage } from './pages/LoginPage';
 import { AdminPage } from './pages/AdminPage';
@@ -33,8 +35,12 @@ function useScrollTopOnNavigate() {
  */
 function TabsLayout() {
   const { onboarded } = useProgress();
+  const { pathname } = useLocation();
+  const [params] = useSearchParams();
   useScrollTopOnNavigate();
   if (!onboarded) return <Navigate to="/welcome" replace />;
+  // A review session runs full screen, like a lesson, so the tab bar never covers the check button.
+  if (pathname === '/review' && params.get('mode')) return <Outlet />;
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[256px_minmax(0,1fr)] lg:grid-cols-[272px_minmax(0,1fr)]">
       <Sidebar />
@@ -61,6 +67,8 @@ export function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/lesson/:id" element={<LessonRoute />} />
       <Route path="/test/:stageId" element={<StageTestPage />} />
+      <Route path="/checkpoint/:id" element={<CheckpointPage />} />
+      <Route path="/exam" element={<ExamPage />} />
       <Route element={<TabsLayout />}>
         <Route index element={<PathPage />} />
         <Route path="/alphabet" element={<AlphabetPage />} />

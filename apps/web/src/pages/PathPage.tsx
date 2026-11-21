@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router';
-import type { Stage } from '@oina/shared';
-import { averageStrength, letterKey, nextLesson, sessionProgress, WEAK_THRESHOLD } from '@oina/engine';
+import type { Lesson, Stage } from '@oina/shared';
+import type { Checkpoint } from '@oina/engine';
+import { averageStrength, checkpoints, letterKey, nextLesson, pendingCheckpoint, sessionProgress, WEAK_THRESHOLD } from '@oina/engine';
 import { useContent } from '../state/content';
 import { useProgress } from '../state/progress';
 import { useSavedSession } from '../state/savedSession';
@@ -15,6 +16,8 @@ import { n, pct } from '../lib/format';
 const ROW = 128;
 const NODE = 80;
 const OFFSETS = [0, 52, 76, 52, 0, -52, -76, -52];
+
+type Node = { kind: 'lesson'; lesson: Lesson } | { kind: 'review'; cp: Checkpoint } | { kind: 'test' };
 
 const accent = (stageId: number): CSSProperties => ({ '--accent': `var(--stage-${((stageId - 1) % 6) + 1})` }) as CSSProperties;
 
@@ -38,6 +41,30 @@ function ContinueCard() {
   const total = index.lessonOrder.length;
   const done = index.lessonOrder.filter((l) => p.completedLessons.includes(l.id)).length;
 
+  const pending = savedLesson ? undefined : pendingCheckpoint(index, p);
+  if (pending) {
+    const older = pending.olderLessonIds.length;
+    return (
+      <div className="mb-3 overflow-hidden rounded-3xl border-2 border-primary bg-surface">
+        <div className="flex items-center gap-4 p-4">
+          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-primary text-3xl text-primary-ink" aria-hidden>🔁</div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-muted">قبل از درس بعدی</p>
+            <p className="text-lg font-extrabold">وقت مرور است!</p>
+            <p className="text-sm text-muted">{older ? `سؤال از دو درس آخر و ${n(older)} درس قبلی` : 'سؤال از درس‌هایی که خواندی'}</p>
+          </div>
+        </div>
+        <Link to={`/checkpoint/${pending.id}`} className="block border-t-2 border-line bg-primary py-3 text-center font-bold text-primary-ink transition active:opacity-80">
+          شروع مرور
+        </Link>
+        {next && (
+          <Link to={`/lesson/${next.id}`} className="block border-t-2 border-line py-2.5 text-center text-sm font-semibold text-muted">
+            فعلاً برو درس بعدی
+          </Link>
+        )}
+      </div>
+    );
+  }
   const lesson = savedLesson || next;
   if (!lesson) {
     return (
@@ -94,16 +121,130 @@ export function PathPage() {
   const open = index.stages.filter((s) => !s.comingSoon && s.lessons.length);
   const soon = index.stages.filter((s) => s.comingSoon || !s.lessons.length);
 
+  const cps = checkpoints(index);
+  const pending = pendingCheckpoint(index, p);
+  // A review that is due takes the hoopoe; the lesson after it waits.
+  const targetId = pending && !saved ? pending.id : target;
+
   const renderStage = (stage: Stage, si: number) => {
     const lessons = stage.lessons.map((id) => index.lessonById.get(id)!);
+    const stageCps = cps.filter((c) => c.stageId === stage.id);
     const doneCount = lessons.filter((l) => p.completedLessons.includes(l.id)).length;
     const testStars = p.stageStars[stage.id] ?? 0;
-    const stars = lessons.reduce((a, l) => a + (p.lessonLevels[l.id] ?? 0), 0) + testStars;
-    const maxStars = lessons.length * 3 + 3;
+    const stars =
+      lessons.reduce((a, l) => a + (p.lessonLevels[l.id] ?? 0), 0) + testStars + stageCps.reduce((a, c) => a + (p.reviewStars[c.id] ?? 0), 0);
+    const maxStars = (lessons.length + stageCps.length) * 3 + 3;
     const complete = doneCount === lessons.length;
-    const steps = lessons.length + 1; // lessons + stage test
+    const nodes: Node[] = [];
+    for (const lesson of lessons) {
+      nodes.push({ kind: 'lesson', lesson });
+      const cp = stageCps.find((c) => c.afterLessonId === lesson.id);
+      if (cp) nodes.push({ kind: 'review', cp });
+    }
+    nodes.push({ kind: 'test' });
+    const steps = nodes.length;
     const offset = (i: number) => OFFSETS[(i + si * 3) % OFFSETS.length]!;
     const points = Array.from({ length: steps }, (_, i) => `${100 + offset(i)},${i * ROW + NODE / 2}`).join(' ');
+
+    const renderLesson = (lesson: Lesson, i: number) => {
+      const id = lesson.id;
+      const done = p.completedLessons.includes(id);
+      const isTarget = targetId === id;
+      const level = p.lessonLevels[id] ?? 0;
+      const strength = averageStrength(p, lesson.newLetters.map(letterKey), now);
+      // Faded and cracked only when the user has practised these letters and they slipped
+      // (a lesson skipped with a stage test has no history yet).
+      const seen = lesson.newLetters.some((l) => p.items[letterKey(l)]);
+      const cracked = done && seen && strength < WEAK_THRESHOLD;
+      const letters = lesson.newLetters.map((l) => index.letterById.get(l)!.upper).join(' ');
+      const x = offset(i);
+      return (
+        <li key={id} className="absolute left-1/2 flex w-40 -translate-x-1/2 flex-col items-center" style={{ top: i * ROW, marginLeft: x }}>
+          <div className="relative">
+            {isTarget && (
+              <span className={`absolute top-1 animate-pop ${x > 0 ? '-left-14' : '-right-14'}`}>
+                <Hoopoe size={48} />
+              </span>
+            )}
+            <Link
+              to={`/lesson/${id}`}
+              aria-label={`درس ${lesson.titleFa}${done ? '، تمام‌شده' : ''}${cracked ? '، نیاز به مرور' : ''}${isTarget && saved ? '، نیمه‌کاره' : ''}`}
+              className={`relative grid h-20 w-20 place-items-center rounded-full border-b-8 text-xl font-bold transition active:translate-y-1 active:border-b-4 ${
+                cracked
+                  ? 'border-line bg-surface-2 text-muted [background-image:repeating-linear-gradient(135deg,transparent_0_10px,var(--line)_10px_12px)]'
+                  : isTarget
+                    ? 'border-black/25 bg-[var(--accent)] text-white ring-8 ring-[color-mix(in_srgb,var(--accent)_25%,transparent)]'
+                    : done
+                      ? 'border-black/20 bg-gold text-[#1d2a2c]'
+                      : 'border-line bg-surface text-ink'
+              }`}
+            >
+              <Cyr>{letters || '★'}</Cyr>
+              {done && !cracked && !isTarget && (
+                <span aria-hidden className="absolute -right-1 -bottom-1 grid h-7 w-7 place-items-center rounded-full border-2 border-bg bg-good text-sm text-white">✓</span>
+              )}
+              {cracked && <span className="absolute -top-1 -left-1 rounded-full bg-cat-trap px-1.5 text-xs text-white">مرور</span>}
+            </Link>
+          </div>
+          <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg/60 px-2 py-0.5 backdrop-blur-sm">
+            <span className="text-sm font-semibold">{lesson.titleFa}</span>
+            {done && <Stars value={level} label={`سطح ${n(level)} از ۳`} />}
+          </span>
+        </li>
+      );
+    };
+
+    const renderReview = (cp: Checkpoint, i: number) => {
+      const st = p.reviewStars[cp.id] ?? 0;
+      const isTarget = targetId === cp.id;
+      const x = offset(i);
+      return (
+        <li key={cp.id} className="absolute left-1/2 flex w-40 -translate-x-1/2 flex-col items-center" style={{ top: i * ROW, marginLeft: x }}>
+          <div className="relative grid h-20 place-items-center">
+            {isTarget && (
+              <span className={`absolute top-1 animate-pop ${x > 0 ? '-left-14' : '-right-14'}`}>
+                <Hoopoe size={48} />
+              </span>
+            )}
+            <Link
+              to={`/checkpoint/${cp.id}`}
+              aria-label={`مرور ${n(cp.n)} مرحله‌ی ${n(stage.id)}${st ? `، ${n(st)} ستاره` : ''}`}
+              className={`grid h-16 w-16 rotate-45 place-items-center rounded-2xl border-b-8 transition active:translate-y-1 active:border-b-4 ${
+                isTarget
+                  ? 'border-black/25 bg-primary text-primary-ink ring-8 ring-primary-soft'
+                  : st
+                    ? 'border-black/20 bg-gold text-[#1d2a2c]'
+                    : 'border-line bg-surface text-primary'
+              }`}
+            >
+              <span className="-rotate-45 text-2xl" aria-hidden>🔁</span>
+            </Link>
+          </div>
+          <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg/60 px-2 py-0.5 backdrop-blur-sm">
+            <span className="text-sm font-semibold">مرور و سؤال</span>
+            {st > 0 && <Stars value={st} label={`${n(st)} ستاره`} />}
+          </span>
+        </li>
+      );
+    };
+
+    const renderTest = (i: number) => (
+      <li key="test" className="absolute left-1/2 flex w-40 -translate-x-1/2 flex-col items-center" style={{ top: i * ROW, marginLeft: offset(i) }}>
+        <div className="grid h-20 place-items-center">
+          <Link
+            to={`/test/${stage.id}`}
+            className={`grid h-16 w-16 place-items-center rounded-2xl border-b-8 text-2xl transition active:translate-y-1 active:border-b-4 ${testStars ? 'border-black/20 bg-gold' : 'border-black/25 bg-[var(--accent)]'}`}
+            aria-label={`آزمون مرحله‌ی ${n(stage.id)}`}
+          >
+            🏆
+          </Link>
+        </div>
+        <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg/60 px-2 py-0.5 backdrop-blur-sm">
+          <span className="text-sm font-semibold">آزمون مرحله</span>
+          {testStars > 0 && <Stars value={testStars} label={`${n(testStars)} ستاره`} />}
+        </span>
+      </li>
+    );
 
     return (
       <section key={stage.id} style={accent(stage.id)} className="mb-12" aria-labelledby={`stage-${stage.id}`}>
@@ -132,68 +273,7 @@ export function PathPage() {
           <svg aria-hidden className="pointer-events-none absolute top-0 left-1/2 -ml-[100px] overflow-visible" width="200" height={steps * ROW}>
             <polyline points={points} fill="none" stroke="var(--line)" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2 18" />
           </svg>
-          {lessons.map((lesson, i) => {
-            const id = lesson.id;
-            const done = p.completedLessons.includes(id);
-            const isTarget = target === id;
-            const level = p.lessonLevels[id] ?? 0;
-            const strength = averageStrength(p, lesson.newLetters.map(letterKey), now);
-            // Faded and cracked only when the user has practised these letters and they slipped
-            // (a lesson skipped with a stage test has no history yet).
-            const seen = lesson.newLetters.some((l) => p.items[letterKey(l)]);
-            const cracked = done && seen && strength < WEAK_THRESHOLD;
-            const letters = lesson.newLetters.map((l) => index.letterById.get(l)!.upper).join(' ');
-            const x = offset(i);
-            return (
-              <li key={id} className="absolute left-1/2 flex w-40 -translate-x-1/2 flex-col items-center" style={{ top: i * ROW, marginLeft: x }}>
-                <div className="relative">
-                  {isTarget && (
-                    <span className={`absolute top-1 animate-pop ${x > 0 ? '-left-14' : '-right-14'}`}>
-                      <Hoopoe size={48} />
-                    </span>
-                  )}
-                  <Link
-                    to={`/lesson/${id}`}
-                    aria-label={`درس ${lesson.titleFa}${done ? '، تمام‌شده' : ''}${cracked ? '، نیاز به مرور' : ''}${isTarget && saved ? '، نیمه‌کاره' : ''}`}
-                    className={`relative grid h-20 w-20 place-items-center rounded-full border-b-8 text-xl font-bold transition active:translate-y-1 active:border-b-4 ${
-                      cracked
-                        ? 'border-line bg-surface-2 text-muted [background-image:repeating-linear-gradient(135deg,transparent_0_10px,var(--line)_10px_12px)]'
-                        : isTarget
-                          ? 'border-black/25 bg-[var(--accent)] text-white ring-8 ring-[color-mix(in_srgb,var(--accent)_25%,transparent)]'
-                          : done
-                            ? 'border-black/20 bg-gold text-[#1d2a2c]'
-                            : 'border-line bg-surface text-ink'
-                    }`}
-                  >
-                    <Cyr>{letters || '★'}</Cyr>
-                    {done && !cracked && !isTarget && (
-                      <span aria-hidden className="absolute -right-1 -bottom-1 grid h-7 w-7 place-items-center rounded-full border-2 border-bg bg-good text-sm text-white">✓</span>
-                    )}
-                    {cracked && <span className="absolute -top-1 -left-1 rounded-full bg-cat-trap px-1.5 text-xs text-white">مرور</span>}
-                  </Link>
-                </div>
-                <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg/60 px-2 py-0.5 backdrop-blur-sm">
-                  <span className="text-sm font-semibold">{lesson.titleFa}</span>
-                  {done && <Stars value={level} label={`سطح ${n(level)} از ۳`} />}
-                </span>
-              </li>
-            );
-          })}
-          <li className="absolute left-1/2 flex w-40 -translate-x-1/2 flex-col items-center" style={{ top: lessons.length * ROW, marginLeft: offset(lessons.length) }}>
-            <div className="grid h-20 place-items-center">
-              <Link
-                to={`/test/${stage.id}`}
-                className={`grid h-16 w-16 place-items-center rounded-2xl border-b-8 text-2xl transition active:translate-y-1 active:border-b-4 ${testStars ? 'border-black/20 bg-gold' : 'border-black/25 bg-[var(--accent)]'}`}
-                aria-label={`آزمون مرحله‌ی ${n(stage.id)}`}
-              >
-                🏆
-              </Link>
-            </div>
-            <span className="mt-1.5 flex flex-col items-center gap-0.5 rounded-xl bg-bg/60 px-2 py-0.5 backdrop-blur-sm">
-              <span className="text-sm font-semibold">آزمون مرحله</span>
-              {testStars > 0 && <Stars value={testStars} label={`${n(testStars)} ستاره`} />}
-            </span>
-          </li>
+          {nodes.map((node, i) => (node.kind === 'lesson' ? renderLesson(node.lesson, i) : node.kind === 'review' ? renderReview(node.cp, i) : renderTest(i)))}
         </ol>
       </section>
     );

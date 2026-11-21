@@ -7,7 +7,10 @@ import type { ItemKey } from '@oina/shared';
 import type { Ctx, Grade, Question, Response } from './exercises.js';
 import { grade, questionForItem } from './exercises.js';
 
-export type SessionMode = 'lesson' | 'review' | 'mistakes' | 'stageTest';
+export type SessionMode = 'lesson' | 'review' | 'mistakes' | 'practice' | 'checkpoint' | 'stageTest' | 'exam';
+
+/** Tests grade first answers only and never repeat a question. */
+export const isTestMode = (mode: SessionMode) => mode === 'stageTest' || mode === 'exam';
 
 export const XP_PER_CORRECT = 10;
 export const XP_PERFECT_BONUS = 15;
@@ -92,8 +95,8 @@ export function answer(s: SessionState, response: Response, ctx: Ctx): AnswerOut
   } else {
     combo = 0;
     for (const it of g.items) if (!it.correct && !missed.includes(it.itemKey)) missed.push(it.itemKey);
-    // Stage tests do not repeat questions; lessons and reviews do.
-    if (s.mode !== 'stageTest' && q.type !== 'match') {
+    // Tests do not repeat questions; lessons and reviews do.
+    if (!isTestMode(s.mode) && q.type !== 'match') {
       const n = (retries[q.itemKey] ?? 0) + 1;
       retries[q.itemKey] = n;
       if (n <= MAX_RETRIES_PER_ITEM) {

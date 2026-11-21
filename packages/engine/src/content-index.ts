@@ -16,7 +16,6 @@ export interface ContentIndex {
   stageById: Map<number, Stage>;
   /** Lessons in teaching order (stage order, then lesson order inside the stage). */
   lessonOrder: Lesson[];
-  audio: Set<string>;
 }
 
 export function buildIndex(bundle: ContentBundle): ContentIndex {
@@ -43,7 +42,6 @@ export function buildIndex(bundle: ContentBundle): ContentIndex {
     lessonById,
     stageById: new Map(stages.map((s) => [s.id, s])),
     lessonOrder,
-    audio: new Set(bundle.audio),
   };
 }
 

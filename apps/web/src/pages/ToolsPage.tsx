@@ -62,7 +62,6 @@ export function ToolsPage() {
           <span>اندازه‌ی قلم</span>
           <input type="range" min={0.875} max={1.375} step={0.125} value={p.settings.fontScale} onChange={(e) => set({ fontScale: Number(e.target.value) })} className="accent-[var(--primary)]" />
         </label>
-        <Toggle label="صدا" checked={p.settings.sound} onChange={(v) => set({ sound: v })} />
         <Toggle label="جان (قلب)" checked={p.settings.hearts} onChange={(v) => set({ hearts: v })} />
       </Card>
 

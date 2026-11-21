@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { ContentBundle } from '@oina/shared';
 import { buildIndex, type ContentIndex } from '@oina/engine';
 import { cachedContent, fetchContent } from '../lib/api';
-import { AUDIO_ENABLED } from '../lib/config';
 
 const Ctx = createContext<ContentIndex | null>(null);
 
@@ -20,7 +19,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const index = useMemo(() => (bundle ? buildIndex(AUDIO_ENABLED ? bundle : { ...bundle, audio: [] }) : null), [bundle]);
+  const index = useMemo(() => (bundle ? buildIndex(bundle) : null), [bundle]);
 
   if (!index) {
     return (

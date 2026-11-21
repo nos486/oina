@@ -151,7 +151,7 @@ admin.get('/stats', async (c) => {
       letters: bundle.letters.length,
       words: bundle.words.length,
       lessons: bundle.lessons.length,
-      audioFiles: bundle.audio.length,
+      stages: bundle.stages.filter((s) => s.lessons.length).length,
       needsReview: bundle.words.filter((w) => w.needsReview).map(({ id, cyrillic, persian }) => ({ id, cyrillic, persian })),
       users,
       recentUsers: recent.map((u) => ({

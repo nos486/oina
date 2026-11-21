@@ -44,7 +44,6 @@ describe('api', () => {
   it('returns JSON 404s and reserves v2 routes', async () => {
     expect((await get('/nope')).status).toBe(404);
     expect((await get('/api/v1/progress')).status).toBe(503); // no D1 binding in this env
-    expect((await get('/audio/tg/words/non.mp3')).status).toBe(404);
   });
 });
 

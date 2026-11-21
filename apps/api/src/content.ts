@@ -5,14 +5,12 @@ import words from '../../../content/words.json';
 import lessons from '../../../content/lessons.json';
 import stages from '../../../content/stages.json';
 import readings from '../../../content/readings.json';
-import audio from '../../../content/audio-manifest.json';
 
 const raw = {
   letters: letters as Letter[],
   words: words as Word[],
   lessons: lessons as Lesson[],
   stages: stages as Stage[],
-  audio: audio as string[],
 };
 
 /** Short content hash, used as the bundle version and ETag. */

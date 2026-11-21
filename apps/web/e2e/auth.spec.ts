@@ -26,7 +26,7 @@ async function mockAccount(page: Page, serverProgress: Record<string, unknown> |
   await page.route('**/api/v1/admin/stats', (route) =>
     route.fulfill({
       json: {
-        contentVersion: 'e2e', letters: 35, words: 175, lessons: 23, audioFiles: 0,
+        contentVersion: 'e2e', letters: 35, words: 175, lessons: 23, stages: 6,
         needsReview: [{ id: 'omon', cyrillic: 'омон', persian: 'امان' }],
         users: 2,
         recentUsers: [{ id: 'u_admin', username: 'admin', name: 'admin', roles: ['admin'], createdAt: '', xp: 120, lessons: 3, lastProgressAt: new Date().toISOString() }],

@@ -81,10 +81,11 @@ describe('lessons, stars, shop', () => {
 describe('progress storage', () => {
   it('normalizes garbage and old data to a valid progress', () => {
     expect(normalizeProgress(null, T0)).toEqual(createProgress(T0));
-    const p = normalizeProgress({ version: 1, xp: 50, hearts: { count: 99 }, settings: { sound: false } }, T0);
+    const p = normalizeProgress({ version: 1, xp: 50, hearts: { count: 99 }, settings: { hearts: false, sound: false } }, T0);
     expect(p.xp).toBe(50);
     expect(p.hearts.count).toBe(5);
-    expect(p.settings.sound).toBe(false);
+    expect(p.settings.hearts).toBe(false);
+    expect('sound' in p.settings).toBe(false);
     expect(p.settings.track).toBe('tg');
   });
 

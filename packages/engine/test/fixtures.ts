@@ -14,7 +14,6 @@ export function realBundle(): ContentBundle {
     words: read('words.json'),
     lessons: read('lessons.json'),
     stages: read('stages.json'),
-    audio: [],
   };
 }
 

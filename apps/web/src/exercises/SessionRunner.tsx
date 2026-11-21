@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { Ctx, Grade, Question, Response, SessionMode, SessionState } from '@oina/engine';
-import { answer, applyAnswer, currentQuestion, gainHeart, loseHeart, nextHeartIn, sessionProgress, startSession } from '@oina/engine';
+import { answer, applyAnswer, isTestMode, currentQuestion, gainHeart, loseHeart, nextHeartIn, sessionProgress, startSession } from '@oina/engine';
 import { Button, ProgressBar } from '../components/ui';
 import { Hoopoe } from '../components/Hoopoe';
 import { Cyr } from '../components/Cyr';
-import { playAudio } from '../lib/audio';
 import { fxCorrect, fxWrong } from '../lib/fx';
 import { n } from '../lib/format';
 import { progressStore, useProgress } from '../state/progress';
@@ -55,17 +54,16 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete, initial
         let next = p;
         for (const it of out.grade.items) next = applyAnswer(next, { itemKey: it.itemKey, correct: it.correct, elapsedMs, chosen: it.chosen }, now);
         if (!out.grade.correct && mode === 'lesson') next = loseHeart(next, now);
-        if (out.grade.correct && mode !== 'lesson' && mode !== 'stageTest') next = gainHeart(next);
+        if (out.grade.correct && mode !== 'lesson' && !isTestMode(mode)) next = gainHeart(next);
         return next;
       });
-      if (out.grade.correct) fxCorrect(progress.settings.sound);
-      else fxWrong(progress.settings.sound);
-      if (q.feedbackAudio && progress.settings.sound) void playAudio(q.feedbackAudio);
+      if (out.grade.correct) fxCorrect();
+      else fxWrong();
       setState(out.state);
       onProgress?.(out.state);
       setFeedback({ grade: out.grade, combo: out.comboActive, q, xp: out.xp, praise: PRAISE[Math.floor(Math.random() * PRAISE.length)]! });
     },
-    [q, feedback, state, ctx, mode, progress.settings.sound, onProgress],
+    [q, feedback, state, ctx, mode, onProgress],
   );
 
   const next = useCallback(() => {
@@ -113,7 +111,7 @@ export function SessionRunner({ mode, questions, level, ctx, onComplete, initial
   return (
     <div className="mx-auto flex min-h-dvh max-w-[720px] flex-col px-4 pt-3">
       <div className="mb-6 flex items-center gap-3">
-        <button type="button" aria-label="خروج از درس" onClick={() => navigate('/')} className="text-2xl text-muted">✕</button>
+        <button type="button" aria-label="خروج از درس" onClick={() => navigate(mode === 'review' || mode === 'mistakes' || mode === 'practice' || mode === 'exam' ? '/review' : '/')} className="text-2xl text-muted">✕</button>
         <div className="relative flex-1">
           <ProgressBar value={sessionProgress(state)} />
           {feedback?.grade.correct && feedback.xp > 0 && (

@@ -79,7 +79,7 @@ export interface AdminStats {
   letters: number;
   words: number;
   lessons: number;
-  audioFiles: number;
+  stages: number;
   needsReview: { id: string; cyrillic: string; persian: string }[];
   /** null when the D1 database is not connected. */
   users: number | null;

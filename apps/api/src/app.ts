@@ -7,7 +7,6 @@ import { admin, auth, progress } from './auth/routes.js';
 
 export interface Env extends AuthEnv {
   ALLOWED_ORIGINS?: string;
-  AUDIO?: R2Bucket;
 }
 
 const DAY = 86400;
@@ -105,20 +104,6 @@ api.route('/progress', progress);
 api.route('/admin', admin);
 
 app.route('/api/v1', api);
-
-/** Audio from R2, if the bucket is bound. Otherwise the web app serves /audio from Pages. */
-app.get('/audio/*', async (c) => {
-  if (!c.env?.AUDIO) return c.json(notFound('audio'), 404);
-  const key = c.req.path.replace(/^\/audio\//, '');
-  const obj = await c.env.AUDIO.get(key);
-  if (!obj) return c.json(notFound('audio'), 404);
-  const headers = new Headers();
-  obj.writeHttpMetadata(headers);
-  headers.set('etag', obj.httpEtag);
-  headers.set('Cache-Control', 'public, max-age=2592000, immutable');
-  headers.set('Access-Control-Allow-Origin', '*');
-  return new Response(obj.body, { headers });
-});
 
 app.notFound((c) => c.json({ error: 'not found' } satisfies ApiError, 404));
 app.onError((err, c) => {

@@ -1,13 +1,10 @@
 import { useEffect } from 'react';
 import type { ChoiceQuestion, Response } from '@oina/engine';
 import { Cyr } from '../components/Cyr';
-import { SoundButton } from '../components/SoundButton';
-import { playAudio } from '../lib/audio';
-import { useProgress } from '../state/progress';
 
 const TITLES: Record<ChoiceQuestion['type'], string> = {
-  letterToSound: 'این حرف چه صدایی دارد؟',
-  soundToLetter: 'کدام حرف این صدا را دارد؟',
+  letterToSound: 'این حرف کدام حرف فارسی است؟',
+  soundToLetter: 'این حرف فارسی در سیریلیک کدام است؟',
   readWord: 'این کلمه را بخوان',
   spotTrap: 'فریبکار را بگیر! این حرف کدام است؟',
 };
@@ -15,13 +12,6 @@ const TITLES: Record<ChoiceQuestion['type'], string> = {
 export function ChoiceExercise({
   q, selected, locked, onChange,
 }: { q: ChoiceQuestion; selected: string | null; locked: boolean; onChange: (r: Response | null, id: string | null) => void }) {
-  const { settings } = useProgress();
-
-  // Auto-play the prompt when it is sound-only.
-  useEffect(() => {
-    if (q.prompt.audioOnly && q.prompt.audio && settings.sound) void playAudio(q.prompt.audio);
-  }, [q.id, q.prompt.audio, q.prompt.audioOnly, settings.sound]);
-
   // Keys 1–4 choose an option (Latin or Persian digits, so a Persian keyboard works too).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -39,13 +29,8 @@ export function ChoiceExercise({
     <div className="flex flex-col gap-6">
       <h2 className="text-xl font-bold">{TITLES[q.type]}</h2>
       <div className="flex min-h-36 items-center justify-center gap-4 rounded-3xl bg-surface-2 p-6">
-        {q.prompt.audioOnly ? (
-          <SoundButton path={q.prompt.audio} size="lg" />
-        ) : q.prompt.script === 'cyr' ? (
-          <>
-            <Cyr className={`${big ? 'text-8xl' : 'text-5xl'} font-bold`}>{q.prompt.text}</Cyr>
-            {q.prompt.audio && <SoundButton path={q.prompt.audio} />}
-          </>
+        {q.prompt.script === 'cyr' ? (
+          <Cyr className={`${big ? 'text-8xl' : 'text-5xl'} font-bold`}>{q.prompt.text}</Cyr>
         ) : (
           <span className="text-6xl font-extrabold">{q.prompt.text}</span>
         )}

@@ -7,4 +7,5 @@ export * from './review-engine.js';
 export * from './exercises.js';
 export * from './session.js';
 export * from './gamification.js';
+export * from './practice.js';
 export * from './translit.js';

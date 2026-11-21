@@ -3,11 +3,9 @@ import type { MatchQuestion, Response } from '@oina/engine';
 import { shuffle, createRng } from '@oina/engine';
 import { Cyr } from '../components/Cyr';
 import { fxCorrect, fxWrong } from '../lib/fx';
-import { useProgress } from '../state/progress';
 
 /** Tap a Cyrillic word, then its Persian pair. Finishes by itself when all pairs are matched. */
 export function MatchExercise({ q, onDone }: { q: MatchQuestion; onDone: (r: Response) => void }) {
-  const { settings } = useProgress();
   const right = useMemo(() => shuffle(q.pairs, createRng(q.pairs.length * 7919 + q.id.length)), [q]);
   const [left, setLeft] = useState<string | null>(null);
   const [done, setDone] = useState<string[]>([]);
@@ -23,13 +21,13 @@ export function MatchExercise({ q, onDone }: { q: MatchQuestion; onDone: (r: Res
   const tapRight = (pairId: string) => {
     if (!left) return;
     if (left === pairId) {
-      fxCorrect(settings.sound);
+      fxCorrect();
       const next = [...done, pairId];
       setDone(next);
       setLeft(null);
       if (next.length === q.pairs.length) onDone({ type: 'match', wrongPairs: wrong });
     } else {
-      fxWrong(settings.sound);
+      fxWrong();
       const chosenFa = q.pairs.find((p) => p.id === pairId)!.fa;
       if (!wrong.some((w) => w.pairId === left)) setWrong([...wrong, { pairId: left, chosenFa }]);
       setShake(pairId);

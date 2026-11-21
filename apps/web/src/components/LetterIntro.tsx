@@ -1,12 +1,10 @@
 import type { Letter } from '@oina/shared';
-import { audioPath } from '@oina/shared';
 import { useContent } from '../state/content';
 import { Button, ProgressBar } from './ui';
 import { Cyr, CyrHighlight } from './Cyr';
-import { SoundButton } from './SoundButton';
 import { CATEGORY } from './categories';
 
-/** Big letter card: shape, Persian value, sound, visual hook, example words (design doc, section 7). */
+/** Big letter card: shape, Persian value, visual hook, example words (design doc, section 7). */
 export function LetterIntro({ letter, step, total, onNext, onExit }: { letter: Letter; step: number; total: number; onNext: () => void; onExit: () => void }) {
   const index = useContent();
   const cat = CATEGORY[letter.category];
@@ -22,11 +20,6 @@ export function LetterIntro({ letter, step, total, onNext, onExit }: { letter: L
         <span className={`rounded-full px-3 py-1 text-sm font-bold text-white ${cat.bg}`}>{cat.labelFa}</span>
         <Cyr className={`text-[6rem] leading-none font-bold ${cat.color}`}>{letter.upper} {letter.lower}</Cyr>
         <p className="text-4xl font-extrabold">= {letter.persian.join(' / ')}</p>
-        <div className="flex gap-3">
-          <SoundButton path={audioPath.letterSound(letter.id)} label="صدای حرف" />
-          <SoundButton path={audioPath.letterSound(letter.id)} slow label="آهسته" />
-          <SoundButton path={audioPath.letterName(letter.id)} label="نام حرف" />
-        </div>
         <p className="text-lg">💡 {letter.mnemonicFa}</p>
         {letter.lookalike && letter.category === 'trap' && (
           <p className="rounded-xl bg-bad-soft px-3 py-2 text-sm font-semibold text-bad">
