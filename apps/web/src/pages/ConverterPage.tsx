@@ -5,6 +5,8 @@ import { Card, Page } from '../components/ui';
 import { Cyr } from '../components/Cyr';
 import { IconCopy, IconX } from '../components/icons';
 import { readingWordPairs } from '../lib/readings';
+import { storyWordPairs } from '../lib/stories';
+import { LetterBreakdown } from '../components/LetterBreakdown';
 import { storage } from '../lib/storage';
 
 const DRAFT_KEY = 'converter:draft';
@@ -19,8 +21,6 @@ const EXAMPLES = [
 
 /** One word, tapped: how each Cyrillic letter maps to Persian. */
 function Breakdown({ token, onClose }: { token: TranslitToken; onClose: () => void }) {
-  const index = useContent();
-  const parts = [...token.src.normalize('NFC')].map((text) => ({ text, letter: index.letterByChar.get(text) }));
   return (
     <div className="animate-rise mt-4 rounded-2xl border-2 border-primary/30 bg-primary-soft/40 p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -36,18 +36,7 @@ function Breakdown({ token, onClose }: { token: TranslitToken; onClose: () => vo
           <IconX width={18} height={18} />
         </button>
       </div>
-      <ul className="flex flex-wrap gap-2" dir="ltr">
-        {parts.map((p, i) =>
-          p.letter ? (
-            <li key={i} className="flex min-w-14 flex-col items-center rounded-xl bg-surface px-2 py-1.5">
-              <Cyr className="text-xl font-bold">{p.text}</Cyr>
-              <span className="text-sm text-muted" dir="rtl">{p.letter.persian.join(' / ')}</span>
-            </li>
-          ) : (
-            <li key={i} className="self-center text-muted">{p.text}</li>
-          ),
-        )}
-      </ul>
+      <LetterBreakdown word={token.src} />
     </div>
   );
 }
@@ -61,7 +50,7 @@ export function ConverterPage() {
   const area = useRef<HTMLTextAreaElement>(null);
 
   const dict = useMemo(
-    () => buildTranslitDict(index.words.filter((w) => w.lang === 'tg').map((w) => [w.cyrillic, w.persian] as [string, string]), readingWordPairs()),
+    () => buildTranslitDict(index.words.filter((w) => w.lang === 'tg').map((w) => [w.cyrillic, w.persian] as [string, string]), [...readingWordPairs(), ...storyWordPairs()]),
     [index],
   );
   const tokens = useMemo(() => cyrillicToPersian(text, dict), [text, dict]);

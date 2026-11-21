@@ -4,7 +4,7 @@
  * - Hashed build files (/assets/*), fonts and icons: cache first (their names change on every build).
  * The content bundle comes from the API and is already kept in localStorage by the app.
  */
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL = `oina-shell-${VERSION}`;
 const ASSETS = `oina-assets-${VERSION}`;
 

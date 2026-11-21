@@ -123,14 +123,15 @@ export function levelInfo(xp: number): { level: number; current: number; next: n
   return { level, current, next, fraction: (xp - current) / (next - current) };
 }
 
-/** Stars collected: up to 3 per lesson (its levels), per review checkpoint and per stage test. */
+/** Stars collected: up to 3 per lesson (its levels), per review checkpoint, per stage test and per story. */
 export function totalStars(progress: Progress): number {
   const sum = (r: Record<string, number>) => Object.values(r).reduce((a, b) => a + b, 0);
-  return sum(progress.lessonLevels) + sum(progress.stageStars as Record<string, number>) + sum(progress.reviewStars);
+  return sum(progress.lessonLevels) + sum(progress.stageStars as Record<string, number>) + sum(progress.reviewStars) + sum(progress.storyStars);
 }
 
-export function maxStars(index: ContentIndex): number {
-  return (index.lessons.length + index.stages.filter((s) => s.lessons.length).length + checkpoints(index).length) * 3;
+/** extraStars: stars outside the content bundle (the stories, bundled into the web app). */
+export function maxStars(index: ContentIndex, extraStars = 0): number {
+  return extraStars + (index.lessons.length + index.stages.filter((s) => s.lessons.length).length + checkpoints(index).length) * 3;
 }
 
 export interface BadgeDef {
@@ -167,6 +168,8 @@ export const BADGES: BadgeDef[] = [
     },
   },
   { id: 'streak-7', titleFa: 'هفت روز پیاپی', descriptionFa: 'هفت روز پشت سر هم هدف روزانه را زدی', earned: (p) => p.streak.count >= 7 },
+  { id: 'first-story', titleFa: 'اولین داستان', descriptionFa: 'اولین داستان کوتاه را تا آخر خواندی', earned: (p) => Object.keys(p.storyStars).length >= 1 },
+  { id: 'bookworm', titleFa: 'کتاب‌خوان', descriptionFa: 'پنج داستان کوتاه را خواندی', earned: (p) => Object.keys(p.storyStars).length >= 5 },
   {
     id: 'tajikistan',
     titleFa: 'Тоҷикистон',

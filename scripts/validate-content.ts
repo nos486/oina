@@ -1,6 +1,6 @@
 /** pnpm content:validate — fails (exit 1) when content breaks the rules in the design doc. */
-import type { Reading } from '@oina/shared';
-import { splitWords, validateContent } from '@oina/engine';
+import type { Reading, Story } from '@oina/shared';
+import { bareWord, splitWords, validateContent } from '@oina/engine';
 import { loadBundle, readJson } from './lib/load-content.js';
 
 const bundle = loadBundle();
@@ -12,6 +12,24 @@ for (const r of readJson<Reading[]>('readings.json')) {
     const b = splitWords(l.persian).length;
     if (a !== b) issues.push({ level: 'error', where: `reading ${r.id} line ${i + 1}`, message: `${a} Cyrillic words but ${b} Persian words` });
   });
+}
+// Stories: the same word-count rule per sentence, unique ids, glossary keys that occur in the text.
+const storyIds = new Set<string>();
+for (const s of readJson<Story[]>('stories.json')) {
+  if (storyIds.has(s.id)) issues.push({ level: 'error', where: `story ${s.id}`, message: 'duplicate id' });
+  storyIds.add(s.id);
+  const keys = new Set<string>();
+  s.paragraphs.forEach((p, pi) =>
+    p.forEach((l, li) => {
+      const a = splitWords(l.cyrillic);
+      const b = splitWords(l.persian).length;
+      a.forEach((w) => keys.add(bareWord(w).toLowerCase()));
+      if (a.length !== b) issues.push({ level: 'error', where: `story ${s.id} ¶${pi + 1} line ${li + 1}`, message: `${a.length} Cyrillic words but ${b} Persian words` });
+    }),
+  );
+  for (const k of Object.keys(s.glossary)) {
+    if (!keys.has(k)) issues.push({ level: 'error', where: `story ${s.id}`, message: `glossary word "${k}" is not in the text` });
+  }
 }
 const errors = issues.filter((i) => i.level === 'error');
 const warnings = issues.filter((i) => i.level === 'warning');

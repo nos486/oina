@@ -98,3 +98,23 @@ describe('progress storage', () => {
     expect(m.lessonLevels).toEqual({ 's1-l1': 2, 's1-l2': 1 });
   });
 });
+
+describe('stories', () => {
+  it('gives more stars for fewer looked-up words and keeps the best', async () => {
+    const { completeStory, storyStars, storyWords, createProgress, normalizeProgress, mergeProgress, totalStars } = await import('../src/index.js');
+    expect(storyStars(0, 60)).toBe(3);
+    expect(storyStars(6, 60)).toBe(2);
+    expect(storyStars(30, 60)).toBe(1);
+    let p = completeStory(createProgress(), 'a', 2, 60);
+    p = completeStory(p, 'a', 40, 60);
+    expect(p.storyStars.a).toBe(3);
+    expect(totalStars(p)).toBe(3);
+    expect(normalizeProgress(JSON.parse(JSON.stringify(p))).storyStars).toEqual({ a: 3 });
+    expect(mergeProgress(createProgress(), p).storyStars).toEqual({ a: 3 });
+    expect(storyWords({ cyrillic: 'Нонҳоро ба хона.', persian: 'نان‌ها_را به خانه.' })).toEqual([
+      { cyr: 'Нонҳоро', fa: 'نان‌ها را', key: 'нонҳоро' },
+      { cyr: 'ба', fa: 'به', key: 'ба' },
+      { cyr: 'хона.', fa: 'خانه.', key: 'хона' },
+    ]);
+  });
+});

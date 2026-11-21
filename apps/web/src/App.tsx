@@ -5,6 +5,8 @@ import { BottomNav } from './components/BottomNav';
 import { Sidebar } from './components/Sidebar';
 import { ConverterPage } from './pages/ConverterPage';
 import { ReaderPage } from './pages/ReaderPage';
+import { StoriesPage } from './pages/StoriesPage';
+import { StoryPage } from './pages/StoryPage';
 import { PathPage } from './pages/PathPage';
 import { AlphabetPage } from './pages/AlphabetPage';
 import { ReviewPage } from './pages/ReviewPage';
@@ -75,6 +77,8 @@ export function App() {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/reading" element={<ReadingPage />} />
         <Route path="/reading/:id" element={<ReaderPage />} />
+        <Route path="/stories" element={<StoriesPage />} />
+        <Route path="/stories/:id" element={<StoryPage />} />
         <Route path="/converter" element={<ConverterPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/tools" element={<ToolsPage />} />

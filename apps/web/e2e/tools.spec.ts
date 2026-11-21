@@ -33,3 +33,18 @@ test('desktop shows a sidebar instead of the tab bar', async ({ page }) => {
   await page.locator('aside').getByRole('link', { name: 'مبدل خط' }).click();
   await expect(page).toHaveURL(/\/converter$/);
 });
+
+test('a short story shows a word in Persian script when tapped and gives stars at the end', async ({ page }) => {
+  await page.goto('/reading');
+  await page.getByRole('link', { name: /داستان‌های کوتاه/ }).click();
+  await page.getByRole('link', { name: /Нони гарм/ }).click();
+  await page.getByRole('button', { name: 'нонвойхона', exact: false }).first().click();
+  const bubble = page.getByRole('dialog');
+  await expect(bubble).toContainText('نانوای‌خانه');
+  await expect(bubble).toContainText('نانوایی');
+  await bubble.getByText('حرف‌به‌حرف ببین').click();
+  await expect(bubble.locator('li')).toHaveCount(10);
+  await page.getByRole('button', { name: 'تمام شد، خواندم!' }).click();
+  await expect(page.getByLabel('۳ ستاره از ۳').first()).toBeVisible();
+  await expect(page.getByText('کلمه‌هایی که کمک گرفتی')).toBeVisible();
+});

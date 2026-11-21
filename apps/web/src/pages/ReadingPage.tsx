@@ -5,6 +5,7 @@ import { useProgress } from '../state/progress';
 import { Page } from '../components/ui';
 import { Cyr } from '../components/Cyr';
 import { READINGS } from '../lib/readings';
+import { STORIES } from '../lib/stories';
 import { n } from '../lib/format';
 import type { Reading } from '@oina/shared';
 
@@ -19,8 +20,9 @@ export function useLetterCoverage() {
   const index = useContent();
   const { completedLessons } = useProgress();
   const known = lettersLearned(index, completedLessons);
-  return (r: Reading) => {
-    const ids = uniqueLetters(r.lines.map((l) => l.cyrillic).join(' '), index.letterByChar);
+  return (r: Reading | string) => {
+    const text = typeof r === 'string' ? r : r.lines.map((l) => l.cyrillic).join(' ');
+    const ids = uniqueLetters(text, index.letterByChar);
     return ids.length ? ids.filter((id) => known.has(id)).length / ids.length : 1;
   };
 }
@@ -30,6 +32,18 @@ export function ReadingPage() {
   const coverage = useLetterCoverage();
   return (
     <Page title="اتاق مطالعه" subtitle="متن‌های کوتاه به خط سیریلیک. هر کلمه را که نتوانستی بخوانی، لمس کن.">
+      <Link
+        to="/stories"
+        className="card mb-5 flex items-center gap-4 rounded-3xl border-2 border-primary/30 bg-primary-soft/40 p-4 transition hover:-translate-y-0.5 hover:border-primary/60 active:scale-[0.99]"
+      >
+        <span aria-hidden className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-surface text-3xl">📚</span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-lg font-extrabold">داستان‌های کوتاه</span>
+          <span className="block text-sm text-muted">{n(STORIES.length)} داستان تاجیکی چندبندی، از آسان تا سخت‌تر. هر کلمه را نتوانستی بخوانی، لمس کن.</span>
+        </span>
+        <span aria-hidden className="text-xl text-primary">←</span>
+      </Link>
+      <h2 className="mb-3 font-bold text-muted">متن‌های کوتاه</h2>
       <ul className="grid gap-3 sm:grid-cols-2">
         {READINGS.map((r) => {
           const c = coverage(r);

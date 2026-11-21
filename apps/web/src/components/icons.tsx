@@ -38,6 +38,13 @@ export const IconBook = (p: P) => (
     <path d="M12 6.5v14" />
   </Svg>
 );
+export const IconStory = (p: P) => (
+  <Svg {...p}>
+    <path d="M6 3.5h10.5a1.5 1.5 0 0 1 1.5 1.5v15.5H7.5A2.5 2.5 0 0 1 5 18V4.5a1 1 0 0 1 1-1Z" />
+    <path d="M5 18a2.5 2.5 0 0 1 2.5-2.5H18" />
+    <path d="M9 7.5h5M9 10.5h3" />
+  </Svg>
+);
 export const IconConvert = (p: P) => (
   <Svg {...p}>
     <path d="M4 8h13l-3.5-3.5" />

@@ -29,6 +29,7 @@ export function createProgress(now: Date = new Date()): Progress {
     recentMistakes: [],
     lessonLevels: {},
     reviewStars: {},
+    storyStars: {},
     exams: [],
     hearts: { count: MAX_HEARTS, lastRefill: now.toISOString() },
     dailyGoal: 20,
@@ -82,6 +83,7 @@ export function normalizeProgress(raw: unknown, now: Date = new Date()): Progres
     recentMistakes: arr(p.recentMistakes).slice(0, MAX_RECENT_MISTAKES),
     lessonLevels: isObj(p.lessonLevels) ? (p.lessonLevels as Progress['lessonLevels']) : {},
     reviewStars: isObj(p.reviewStars) ? (p.reviewStars as Progress['reviewStars']) : {},
+    storyStars: isObj(p.storyStars) ? (p.storyStars as Progress['storyStars']) : {},
     exams: normalizeExams(p.exams),
     hearts: isObj(p.hearts)
       ? { count: Math.min(MAX_HEARTS, Math.max(0, num(p.hearts.count, MAX_HEARTS))), lastRefill: String(p.hearts.lastRefill ?? base.hearts.lastRefill) }
@@ -119,6 +121,7 @@ export function mergeProgress(a: Progress, b: Progress): Progress {
     confusions: maxRecord(a.confusions, b.confusions),
     lessonLevels: maxRecord(a.lessonLevels, b.lessonLevels),
     reviewStars: maxRecord(a.reviewStars, b.reviewStars),
+    storyStars: maxRecord(a.storyStars, b.storyStars),
     exams: [...new Map([...a.exams, ...b.exams].map((e) => [e.at, e])).values()].sort((x, y) => (x.at < y.at ? 1 : -1)).slice(0, MAX_EXAMS),
     xpByDay: maxRecord(a.xpByDay, b.xpByDay),
     badges: [...new Set([...a.badges, ...b.badges])],

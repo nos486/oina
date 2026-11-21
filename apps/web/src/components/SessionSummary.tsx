@@ -16,13 +16,18 @@ export interface Rewards {
 
 /** Adds the session's XP and new badges to progress; reports what changed for the result screen. */
 export function commitRewards(index: ContentIndex, s: SessionState, extra?: Parameters<typeof progressStore.update>[0]): Rewards {
+  return commitXp(index, s.xp, extra);
+}
+
+/** Adds XP (and whatever `extra` changes) plus new badges; reports what changed. */
+export function commitXp(index: ContentIndex, xp: number, extra?: Parameters<typeof progressStore.update>[0]): Rewards {
   const now = new Date();
   const before = progressStore.get();
   const levelBefore = levelForXp(before.xp);
   const goalBefore = xpToday(before, now) >= before.dailyGoal;
   let badges: string[] = [];
   progressStore.update((p) => {
-    const r = awardBadges(addXp(extra ? extra(p) : p, s.xp, now), index, now);
+    const r = awardBadges(addXp(extra ? extra(p) : p, xp, now), index, now);
     badges = r.earned;
     return r.progress;
   });

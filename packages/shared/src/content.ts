@@ -111,6 +111,25 @@ export interface Reading {
   lines: MiniReading[];
 }
 
+/** A short graded story to read. Bundled into the web app like the reading room. */
+export interface Story {
+  id: string;
+  titleCyr: string;
+  titleFa: string;
+  emoji: string;
+  /** 1 = easy … 3 = harder. */
+  level: 1 | 2 | 3;
+  summaryFa: string;
+  /**
+   * Paragraphs of sentences. Each sentence has the same number of space-separated words in both
+   * scripts. In the Persian line "_" joins what Persian writes apart but Tajik writes as one word
+   * (نان‌ها_را for нонҳоро); it is shown as a space.
+   */
+  paragraphs: MiniReading[][];
+  /** Lower-case Cyrillic word as it appears in the text → its meaning, for words a Persian speaker may not know. */
+  glossary: Record<string, string>;
+}
+
 /** Everything the client needs to run lessons, in one payload. */
 export interface ContentBundle {
   version: string;

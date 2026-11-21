@@ -51,6 +51,8 @@ export interface Progress {
   lessonLevels: Record<string, 0 | 1 | 2 | 3>;
   /** Stars of the review checkpoints on the path, by checkpoint id ("review-s2-1"). */
   reviewStars: Record<string, 0 | 1 | 2 | 3>;
+  /** Stars of the short stories, by story id: fewer words looked up = more stars. */
+  storyStars: Record<string, 0 | 1 | 2 | 3>;
   /** General exams, newest first (at most 20). */
   exams: ExamRecord[];
   hearts: { count: number; lastRefill: string };

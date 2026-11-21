@@ -7,6 +7,7 @@ import { Cyr } from '../components/Cyr';
 import { Hoopoe } from '../components/Hoopoe';
 import { InstallCard } from '../components/InstallCard';
 import { n } from '../lib/format';
+import { STORIES } from '../lib/stories';
 
 const WEEKDAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 const WEEKS = 6;
@@ -140,7 +141,7 @@ export function ProfilePage() {
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { v: n(streak), l: 'روز پیاپی', c: 'text-cat-trap', i: '🔥' },
-          { v: `${n(totalStars(p))}/${n(maxStars(index))}`, l: 'ستاره', c: 'text-gold', i: '⭐' },
+          { v: `${n(totalStars(p))}/${n(maxStars(index, STORIES.length * 3))}`, l: 'ستاره', c: 'text-gold', i: '⭐' },
           { v: `${n(lessonsDone)}/${n(index.lessonOrder.length)}`, l: 'درس', c: 'text-primary', i: '📚' },
           { v: n(wordsRead), l: 'کلمه خواندی', c: 'text-cat-new', i: '📖' },
         ].map((s) => (
